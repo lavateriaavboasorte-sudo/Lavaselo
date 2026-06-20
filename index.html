@@ -2,7 +2,14 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
+<meta name="theme-color" content="#081356">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lavateria">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Lavateria Av. Boa Sorte — Cartão Fidelidade</title>
 <style>
   :root{
@@ -24,16 +31,20 @@
     --corpo: 'Inter', -apple-system, sans-serif;
     --mono: 'JetBrains Mono', monospace;
   }
-  *{box-sizing:border-box; margin:0; padding:0;}
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+  html{ -webkit-text-size-adjust:100%; }
   body{
     font-family:var(--corpo);
     background:var(--azul-fundo);
     color:var(--texto-claro);
     min-height:100vh;
+    min-height:100dvh;
+    -webkit-font-smoothing:antialiased;
     background-image:
       radial-gradient(circle at 15% 20%, rgba(43,127,255,0.14), transparent 40%),
       radial-gradient(circle at 85% 80%, rgba(232,34,10,0.05), transparent 45%);
   }
+  button{ -webkit-appearance:none; appearance:none; }
   ::selection{ background:var(--agua); color:var(--azul-fundo); }
 
   #loading{
@@ -54,6 +65,9 @@
   .topo{
     display:flex; align-items:center; justify-content:space-between;
     padding:22px clamp(20px,5vw,56px);
+    padding-top:calc(22px + env(safe-area-inset-top));
+    padding-left:calc(clamp(20px,5vw,56px) + env(safe-area-inset-left));
+    padding-right:calc(clamp(20px,5vw,56px) + env(safe-area-inset-right));
     border-bottom:1px solid var(--azul-linha);
   }
   .marca{ display:flex; align-items:center; gap:12px; }
@@ -114,10 +128,13 @@
 
   .servicos{ display:grid; grid-template-columns:1fr 1fr; gap:12px; position:relative; z-index:1; }
   .servico-opt{
-    border:1.5px solid var(--azul-linha); border-radius:12px; padding:18px 14px;
+    border:1.5px solid var(--azul-linha); border-radius:12px; padding:22px 14px;
     text-align:center; cursor:pointer; transition:.15s; background:var(--azul-fundo);
+    min-height:96px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    user-select:none;
   }
   .servico-opt:hover:not(.bloqueado){ border-color:var(--agua-clara); }
+  .servico-opt:not(.bloqueado):active{ transform:scale(.97); }
   .servico-opt.sel{
     border-color:var(--dourado); background:rgba(242,183,5,.16);
     box-shadow:0 0 0 3px rgba(242,183,5,.18);
@@ -143,7 +160,7 @@
     display:flex; align-items:center; justify-content:center; gap:9px;
   }
   .btn-validar:hover{ background:var(--carimbo-escuro); transform:translateY(-1px); }
-  .btn-validar:active{ transform:translateY(0); }
+  .btn-validar:active{ transform:scale(.98); }
   .btn-validar:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
   .btn-validar:focus-visible{ outline:2px solid var(--agua-clara); outline-offset:3px; }
 
@@ -174,10 +191,11 @@
   }
   .btn-novo:hover{ border-color:var(--agua); }
 
-  .rodape-cliente{ text-align:center; margin-top:36px; }
+  .rodape-cliente{ text-align:center; margin-top:36px; padding-bottom:env(safe-area-inset-bottom); }
   .rodape-cliente button{
-    background:none; border:none; color:var(--texto-fraco); font-size:12px; cursor:pointer;
+    background:none; border:none; color:var(--texto-fraco); font-size:13px; cursor:pointer;
     text-decoration:underline; text-underline-offset:3px; font-family:var(--corpo);
+    padding:12px 16px; min-height:44px;
   }
 
   .login-wrap{ max-width:380px; margin:90px auto; padding:0 24px; }
@@ -281,11 +299,16 @@
   .toast.erro{ border-color:var(--carimbo); color:#ff9381; }
 
   @media (max-width:600px){
-    .servicos{ grid-template-columns:1fr; }
+    .container{ padding:36px 18px 60px; }
+    .servicos{ grid-template-columns:1fr 1fr; }
+    .servico-opt{ min-height:104px; }
+    .servico-opt .ic{ font-size:28px; }
     .podio-item{ flex-wrap:wrap; }
     th:nth-child(4), td:nth-child(4){ display:none; }
     .filtros{ flex-wrap:wrap; }
     .btn-atualizar{ margin-left:0; }
+    .selo-hero{ margin-bottom:32px; }
+    .btn-resgatar{ width:100%; margin-top:6px; }
   }
 </style>
 </head>
@@ -620,6 +643,7 @@
 
       cartaoForm.style.display = 'none';
       resultadoOk.classList.add('show');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }catch(e){
       console.error(e);
       erroGeral.textContent = 'Não foi possível registrar agora. Verifique sua internet e tente novamente.';
