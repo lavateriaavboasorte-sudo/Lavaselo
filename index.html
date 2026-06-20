@@ -17,6 +17,7 @@
     --carimbo-escuro:#B81A06;
     --ouro:#2B7FFF;             /* destaque do pódio agora em azul brilhante */
     --premio:#E8220A;           /* Vermelho Fast: cliente pronto para prêmio */
+    --dourado:#F2B705;          /* dourado de seleção (combina com a paleta) */
     --texto-claro:#FFFFFF;      /* branco sobre azul */
     --texto-fraco:#B8D4FF;      /* Azul Bolha para texto secundário */
     --display: 'Fraunces', Georgia, serif;
@@ -117,7 +118,11 @@
     text-align:center; cursor:pointer; transition:.15s; background:var(--azul-fundo);
   }
   .servico-opt:hover:not(.bloqueado){ border-color:var(--agua-clara); }
-  .servico-opt.sel{ border-color:var(--agua); background:rgba(43,127,255,.18); }
+  .servico-opt.sel{
+    border-color:var(--dourado); background:rgba(242,183,5,.16);
+    box-shadow:0 0 0 3px rgba(242,183,5,.18);
+  }
+  .servico-opt.sel .nome{ color:var(--dourado); }
   .servico-opt .ic{ font-size:24px; display:block; margin-bottom:8px; }
   .servico-opt .nome{ font-weight:600; font-size:14.5px; }
   .servico-opt.bloqueado{ opacity:.35; cursor:not-allowed; }
