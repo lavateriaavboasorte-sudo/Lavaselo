@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LavaSelo</title>
+<style>
+  :root{
+    --azul-fundo:#0E2A3D;
+    --azul-painel:#123A52;
+    --azul-linha:#1C4D6B;
+    --espuma:#EFF6F4;
+    --agua:#2FA9C9;
+    --agua-clara:#7FD4E8;
+    --carimbo:#D9472B;
+    --carimbo-escuro:#A8351F;
+    --ouro:#E8B23D;
+    --texto-claro:#EAF4F6;
+    --texto-fraco:#9FC2D1;
+    --display: 'Fraunces', Georgia, serif;
+    --corpo: 'Inter', -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:var(--corpo);
+    background:var(--azul-fundo);
+    color:var(--texto-claro);
+    min-height:100vh;
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(47,169,201,0.10), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(232,178,61,0.06), transparent 45%);
+  }
+  ::selection{ background:var(--agua); color:var(--azul-fundo); }
+
+  #loading{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    background:var(--azul-fundo); z-index:999; flex-direction:column; gap:14px;
+  }
+  .gota{
+    width:34px; height:34px; border-radius:50% 50% 50% 0;
+    background:var(--agua); transform:rotate(45deg);
+    animation:pulsar 1.1s ease-in-out infinite;
+  }
+  @keyframes pulsar{ 0%,100%{opacity:.4; transform:rotate(45deg) scale(.9);} 50%{opacity:1; transform:rotate(45deg) scale(1.1);} }
+  #loading span{ color:var(--texto-fraco); font-size:13px; letter-spacing:.04em; }
+
+  #app{ display:none; min-height:100vh; }
+  #app.pronto{ display:block; }
+
+  .topo{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px clamp(20px,5vw,56px);
+    border-bottom:1px solid var(--azul-linha);
+  }
+  .marca{ display:flex; align-items:center; gap:12px; }
+  .marca-icone{
+    width:38px; height:38px; border-radius:50%;
+    background:conic-gradient(from 200deg, var(--agua), var(--agua-clara), var(--agua));
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--display); font-weight:700; color:var(--azul-fundo); font-size:15px;
+  }
+  .marca-nome{ font-family:var(--display); font-size:20px; font-weight:600; letter-spacing:.01em; }
+  .marca-sub{ font-size:11px; color:var(--texto-fraco); letter-spacing:.08em; text-transform:uppercase; margin-top:-2px;}
+
+  .nav-link{
+    background:none; border:1px solid var(--azul-linha); color:var(--texto-fraco);
+    padding:9px 16px; border-radius:100px; font-size:13px; cursor:pointer;
+    transition:.18s; font-family:var(--corpo); display:flex; align-items:center; gap:7px;
+  }
+  .nav-link:hover{ border-color:var(--agua); color:var(--texto-claro); }
+  .nav-link:focus-visible{ outline:2px solid var(--agua); outline-offset:2px; }
+
+  .container{ max-width:560px; margin:0 auto; padding:56px 24px 80px; }
+  .selo-hero{ text-align:center; margin-bottom:44px; }
+  .eyebrow{
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--agua-clara);
+    font-family:var(--mono); display:block; margin-bottom:14px;
+  }
+  .selo-hero h1{
+    font-family:var(--display); font-size:clamp(32px,6vw,46px); font-weight:600;
+    line-height:1.08; margin-bottom:14px;
+  }
+  .selo-hero h1 em{ color:var(--agua-clara); font-style:normal; }
+  .selo-hero p{ color:var(--texto-fraco); font-size:15px; line-height:1.6; max-width:420px; margin:0 auto; }
+
+  .cartao{
+    background:var(--azul-painel); border:1px solid var(--azul-linha); border-radius:20px;
+    padding:clamp(24px,5vw,40px); position:relative; overflow:hidden;
+  }
+  .cartao::before{
+    content:''; position:absolute; top:-60px; right:-60px; width:160px; height:160px;
+    border-radius:50%; background:radial-gradient(circle, rgba(47,169,201,.18), transparent 70%);
+  }
+
+  .campo{ margin-bottom:22px; position:relative; z-index:1; }
+  .campo label{
+    display:block; font-size:12px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--texto-fraco); margin-bottom:9px; font-family:var(--mono);
+  }
+  .campo input[type=text]{
+    width:100%; background:var(--azul-fundo); border:1.5px solid var(--azul-linha);
+    color:var(--texto-claro); padding:14px 16px; border-radius:10px; font-size:16px;
+    font-family:var(--mono); letter-spacing:.02em; transition:.15s;
+  }
+  .campo input[type=text]:focus{ outline:none; border-color:var(--agua); }
+  .campo input[type=text]::placeholder{ color:#4A6B7C; }
+  .erro-msg{ color:var(--carimbo); font-size:12.5px; margin-top:7px; display:none; }
+  .erro-msg.show{ display:block; }
+
+  .servicos{ display:grid; grid-template-columns:1fr 1fr; gap:12px; position:relative; z-index:1; }
+  .servico-opt{
+    border:1.5px solid var(--azul-linha); border-radius:12px; padding:18px 14px;
+    text-align:center; cursor:pointer; transition:.15s; background:var(--azul-fundo);
+  }
+  .servico-opt:hover:not(.bloqueado){ border-color:var(--agua-clara); }
+  .servico-opt.sel{ border-color:var(--agua); background:rgba(47,169,201,.12); }
+  .servico-opt .ic{ font-size:24px; display:block; margin-bottom:8px; }
+  .servico-opt .nome{ font-weight:600; font-size:14.5px; }
+  .servico-opt.bloqueado{ opacity:.35; cursor:not-allowed; }
+  .servico-opt.bloqueado .nome::after{ content:' 🔒'; font-size:11px; }
+
+  .aviso-promo{
+    margin-top:14px; padding:11px 14px; background:rgba(232,178,61,.1);
+    border:1px solid rgba(232,178,61,.3); border-radius:10px; font-size:12.5px;
+    color:var(--ouro); position:relative; z-index:1; display:none; line-height:1.5;
+  }
+  .aviso-promo.show{ display:block; }
+
+  .btn-validar{
+    width:100%; margin-top:26px; background:var(--carimbo); color:white; border:none;
+    padding:17px; border-radius:12px; font-size:15.5px; font-weight:700; cursor:pointer;
+    font-family:var(--corpo); letter-spacing:.02em; transition:.15s; position:relative; z-index:1;
+    display:flex; align-items:center; justify-content:center; gap:9px;
+  }
+  .btn-validar:hover{ background:var(--carimbo-escuro); transform:translateY(-1px); }
+  .btn-validar:active{ transform:translateY(0); }
+  .btn-validar:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
+  .btn-validar:focus-visible{ outline:2px solid var(--agua-clara); outline-offset:3px; }
+
+  .erro-geral{
+    margin-top:16px; padding:12px 14px; background:rgba(217,71,43,.1);
+    border:1px solid rgba(217,71,43,.3); border-radius:10px; font-size:13px;
+    color:#ff9381; display:none; position:relative; z-index:1;
+  }
+  .erro-geral.show{ display:block; }
+
+  .resultado{ display:none; text-align:center; padding:40px 24px; }
+  .resultado.show{ display:block; animation:surgir .4s ease; }
+  @keyframes surgir{ from{opacity:0; transform:scale(.92);} to{opacity:1; transform:scale(1);} }
+  .carimbo-visual{
+    width:120px; height:120px; margin:0 auto 22px; border-radius:50%;
+    border:4px solid var(--carimbo); display:flex; align-items:center; justify-content:center;
+    transform:rotate(-8deg); animation:bater .5s cubic-bezier(.34,1.56,.64,1);
+    box-shadow:0 0 0 4px rgba(217,71,43,.15);
+  }
+  @keyframes bater{ 0%{transform:rotate(-8deg) scale(2); opacity:0;} 60%{transform:rotate(-8deg) scale(.95);} 100%{transform:rotate(-8deg) scale(1); opacity:1;} }
+  .carimbo-visual span{ font-family:var(--display); font-weight:700; color:var(--carimbo); font-size:15px; letter-spacing:.02em; }
+  .resultado h2{ font-family:var(--display); font-size:26px; margin-bottom:10px; }
+  .resultado p{ color:var(--texto-fraco); font-size:14.5px; line-height:1.6; margin-bottom:6px; }
+  .resultado .contagem{ font-family:var(--mono); color:var(--agua-clara); font-size:13px; margin-top:18px; }
+  .btn-novo{
+    margin-top:24px; background:none; border:1px solid var(--azul-linha); color:var(--texto-claro);
+    padding:12px 24px; border-radius:100px; cursor:pointer; font-size:13.5px; font-family:var(--corpo);
+  }
+  .btn-novo:hover{ border-color:var(--agua); }
+
+  .rodape-cliente{ text-align:center; margin-top:36px; }
+  .rodape-cliente button{
+    background:none; border:none; color:var(--texto-fraco); font-size:12px; cursor:pointer;
+    text-decoration:underline; text-underline-offset:3px; font-family:var(--corpo);
+  }
+
+  .login-wrap{ max-width:380px; margin:90px auto; padding:0 24px; }
+  .login-card{
+    background:var(--azul-painel); border:1px solid var(--azul-linha); border-radius:18px; padding:36px 32px;
+  }
+  .login-card h2{ font-family:var(--display); font-size:24px; margin-bottom:6px; }
+  .login-card p{ color:var(--texto-fraco); font-size:13px; margin-bottom:26px; }
+  .login-card input{
+    width:100%; background:var(--azul-fundo); border:1.5px solid var(--azul-linha); color:var(--texto-claro);
+    padding:13px 15px; border-radius:9px; font-size:14.5px; margin-bottom:14px; font-family:var(--corpo);
+  }
+  .login-card input:focus{ outline:none; border-color:var(--agua); }
+  .btn-entrar{
+    width:100%; background:var(--agua); color:var(--azul-fundo); border:none; padding:14px;
+    border-radius:9px; font-weight:700; font-size:14.5px; cursor:pointer; margin-top:6px;
+  }
+  .btn-entrar:hover{ background:var(--agua-clara); }
+  .login-erro{ color:var(--carimbo); font-size:12.5px; margin-top:10px; display:none; text-align:center; }
+  .login-erro.show{ display:block; }
+
+  .painel{ padding:32px clamp(20px,5vw,56px) 70px; max-width:1180px; margin:0 auto; }
+  .painel-cabecalho{ display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px; margin-bottom:32px; }
+  .painel-cabecalho h1{ font-family:var(--display); font-size:28px; font-weight:600; }
+  .painel-cabecalho .sub{ color:var(--texto-fraco); font-size:13px; margin-top:4px; }
+
+  .abas{ display:flex; gap:8px; margin-bottom:28px; border-bottom:1px solid var(--azul-linha); }
+  .aba{
+    background:none; border:none; color:var(--texto-fraco); padding:11px 4px; margin-right:22px;
+    font-size:14px; cursor:pointer; border-bottom:2px solid transparent; font-family:var(--corpo); font-weight:500;
+  }
+  .aba.ativa{ color:var(--texto-claro); border-color:var(--agua); }
+
+  .secao{ display:none; }
+  .secao.ativa{ display:block; animation:surgir .25s ease; }
+
+  .filtros{ display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
+  .filtro-btn{
+    background:var(--azul-painel); border:1px solid var(--azul-linha); color:var(--texto-fraco);
+    padding:8px 16px; border-radius:100px; font-size:12.5px; cursor:pointer; font-family:var(--corpo);
+  }
+  .filtro-btn.ativo{ border-color:var(--agua); color:var(--texto-claro); background:rgba(47,169,201,.1); }
+  .btn-atualizar{
+    margin-left:auto; background:none; border:1px solid var(--azul-linha); color:var(--texto-fraco);
+    padding:8px 14px; border-radius:100px; font-size:12.5px; cursor:pointer; font-family:var(--corpo);
+  }
+  .btn-atualizar:hover{ border-color:var(--agua); color:var(--texto-claro); }
+
+  .stats-grade{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:28px; }
+  .stat-card{ background:var(--azul-painel); border:1px solid var(--azul-linha); border-radius:14px; padding:18px 20px; }
+  .stat-card .num{ font-family:var(--display); font-size:30px; font-weight:600; color:var(--agua-clara); }
+  .stat-card .lbl{ font-size:11.5px; color:var(--texto-fraco); text-transform:uppercase; letter-spacing:.06em; margin-top:2px; }
+
+  .tabela-wrap{ background:var(--azul-painel); border:1px solid var(--azul-linha); border-radius:14px; overflow:hidden; }
+  table{ width:100%; border-collapse:collapse; }
+  th{
+    text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--texto-fraco);
+    padding:14px 18px; border-bottom:1px solid var(--azul-linha); font-family:var(--mono); font-weight:500;
+  }
+  td{ padding:14px 18px; border-bottom:1px solid var(--azul-linha); font-size:14px; }
+  tr:last-child td{ border-bottom:none; }
+  tr:hover td{ background:rgba(47,169,201,.04); }
+  .tag-serv{ padding:4px 10px; border-radius:100px; font-size:11.5px; font-weight:600; }
+  .tag-serv.lavagem{ background:rgba(47,169,201,.15); color:var(--agua-clara); }
+  .tag-serv.secagem{ background:rgba(232,178,61,.15); color:var(--ouro); }
+  .cpf-mono{ font-family:var(--mono); letter-spacing:.02em; }
+  .vazio{ padding:50px 20px; text-align:center; color:var(--texto-fraco); font-size:14px; }
+
+  .podio-grade{ display:grid; gap:14px; }
+  .podio-item{
+    background:var(--azul-painel); border:1px solid var(--azul-linha); border-radius:14px;
+    padding:18px 22px; display:flex; align-items:center; gap:18px;
+  }
+  .podio-item.pronto{ border-color:var(--ouro); background:rgba(232,178,61,.06); }
+  .podio-pos{
+    font-family:var(--display); font-size:22px; font-weight:700; color:var(--texto-fraco);
+    width:30px; text-align:center; flex-shrink:0;
+  }
+  .podio-item.pronto .podio-pos{ color:var(--ouro); }
+  .podio-info{ flex:1; min-width:0; }
+  .podio-info .cpf{ font-family:var(--mono); font-size:15px; font-weight:600; }
+  .podio-info .progresso-txt{ font-size:12px; color:var(--texto-fraco); margin-top:3px; }
+  .barra-bg{ width:100%; height:7px; background:var(--azul-fundo); border-radius:100px; margin-top:8px; overflow:hidden; }
+  .barra-fill{ height:100%; background:var(--agua); border-radius:100px; transition:width .3s; }
+  .podio-item.pronto .barra-fill{ background:var(--ouro); }
+  .selo-fundo{ font-size:13px; color:var(--texto-fraco); flex-shrink:0; font-family:var(--mono); }
+  .btn-resgatar{
+    background:var(--ouro); color:var(--azul-fundo); border:none; padding:10px 18px;
+    border-radius:9px; font-size:12.5px; font-weight:700; cursor:pointer; flex-shrink:0; font-family:var(--corpo);
+  }
+  .btn-resgatar:hover{ background:#f2c25c; }
+  .btn-resgatar:disabled{ opacity:.6; cursor:wait; }
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--azul-painel); border:1px solid var(--azul-linha); color:var(--texto-claro);
+    padding:13px 22px; border-radius:100px; font-size:13.5px; opacity:0; pointer-events:none;
+    transition:.25s; z-index:500; box-shadow:0 8px 24px rgba(0,0,0,.3);
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .toast.erro{ border-color:var(--carimbo); color:#ff9381; }
+
+  @media (max-width:600px){
+    .servicos{ grid-template-columns:1fr; }
+    .podio-item{ flex-wrap:wrap; }
+    th:nth-child(4), td:nth-child(4){ display:none; }
+    .filtros{ flex-wrap:wrap; }
+    .btn-atualizar{ margin-left:0; }
+  }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="gota"></div>
+  <span>Carregando LavaSelo…</span>
+</div>
+
+<div id="app">
+
+  <div class="topo">
+    <div class="marca">
+      <div class="marca-icone">LS</div>
+      <div>
+        <div class="marca-nome">LavaSelo</div>
+        <div class="marca-sub">cartão fidelidade</div>
+      </div>
+    </div>
+    <button class="nav-link" id="btnTopoAcao"></button>
+  </div>
+
+  <div id="telaCliente">
+    <div class="container">
+      <div class="selo-hero">
+        <span class="eyebrow">Validação de serviço</span>
+        <h1>Acabou de lavar?<br><em>Carimbe seu selo.</em></h1>
+        <p>Informe seu CPF e o serviço realizado hoje. A cada 9 selos completos, um serviço é por nossa conta.</p>
+      </div>
+
+      <div class="cartao" id="cartaoForm">
+        <div class="campo">
+          <label for="inputCpf">Seu CPF</label>
+          <input type="text" id="inputCpf" placeholder="000.000.000-00" maxlength="14" inputmode="numeric">
+          <div class="erro-msg" id="erroCpf">CPF inválido. Confira os números e tente de novo.</div>
+        </div>
+
+        <div class="campo">
+          <label>Serviço realizado</label>
+          <div class="servicos">
+            <div class="servico-opt" data-servico="Lavagem" id="optLavagem">
+              <span class="ic">💧</span>
+              <span class="nome">Lavagem</span>
+            </div>
+            <div class="servico-opt" data-servico="Secagem" id="optSecagem">
+              <span class="ic">🌬️</span>
+              <span class="nome">Secagem</span>
+            </div>
+          </div>
+          <div class="aviso-promo" id="avisoPromo">
+            Hoje é dia promocional — apenas <strong>Lavagem</strong> pode ser carimbada. Secagem fica disponível nos outros dias da semana.
+          </div>
+        </div>
+
+        <button class="btn-validar" id="btnValidar" disabled>
+          <span>🔖</span> Validar selo
+        </button>
+
+        <div class="erro-geral" id="erroGeral"></div>
+      </div>
+
+      <div class="resultado" id="resultadoOk">
+        <div class="carimbo-visual"><span>OK</span></div>
+        <h2 id="resultadoTitulo">Selo carimbado!</h2>
+        <p id="resultadoTexto">Seu serviço foi registrado com sucesso.</p>
+        <p class="contagem" id="resultadoContagem"></p>
+        <button class="btn-novo" id="btnNovoCheckin">Carimbar outro selo</button>
+      </div>
+
+      <div class="rodape-cliente">
+        <button id="linkAreaInterna">Acesso à área interna</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="telaLogin" style="display:none;">
+    <div class="login-wrap">
+      <div class="login-card">
+        <h2>Área interna</h2>
+        <p>Entre para ver o painel de selos validados.</p>
+        <input type="text" id="loginUser" placeholder="Usuário" autocomplete="username">
+        <input type="password" id="loginPass" placeholder="Senha" autocomplete="current-password">
+        <button class="btn-entrar" id="btnEntrar">Entrar</button>
+        <div class="login-erro" id="loginErro">Usuário ou senha incorretos.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="telaPainel" style="display:none;">
+    <div class="painel">
+      <div class="painel-cabecalho">
+        <div>
+          <h1>Painel de selos</h1>
+          <div class="sub">Olá, Erike Brusnney — aqui está o panorama dos check-ins.</div>
+        </div>
+      </div>
+
+      <div class="abas">
+        <button class="aba ativa" data-secao="secaoLista">Check-ins</button>
+        <button class="aba" data-secao="secaoPodio">Pódio (9 selos)</button>
+      </div>
+
+      <div class="secao ativa" id="secaoLista">
+        <div class="filtros">
+          <button class="filtro-btn ativo" data-periodo="semana">Esta semana</button>
+          <button class="filtro-btn" data-periodo="mes">Este mês</button>
+          <button class="filtro-btn" data-periodo="todos">Todos</button>
+          <button class="btn-atualizar" id="btnAtualizarLista">↻ Atualizar</button>
+        </div>
+
+        <div class="stats-grade" id="statsGrade"></div>
+
+        <div class="tabela-wrap">
+          <table>
+            <thead>
+              <tr><th>CPF</th><th>Serviço</th><th>Data</th><th>Hora</th></tr>
+            </thead>
+            <tbody id="corpoTabela"></tbody>
+          </table>
+          <div class="vazio" id="vazioLista" style="display:none;">Nenhum check-in neste período ainda.</div>
+        </div>
+      </div>
+
+      <div class="secao" id="secaoPodio">
+        <p style="color:var(--texto-fraco); font-size:13.5px; margin-bottom:20px; line-height:1.6;">
+          Cada CPF avança a cada selo novo. Ao completar <strong style="color:var(--ouro);">9 selos</strong>, o cliente está pronto para o serviço gratuito. Marque como resgatado para reiniciar a contagem dele.
+        </p>
+        <div class="podio-grade" id="podioGrade"></div>
+        <div class="vazio" id="vazioPodio" style="display:none;">Nenhum cliente com selos registrados ainda.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/supabase-js/2.45.4/supabase.min.js"></script>
+<script>
+(function(){
+
+  // ============================================================
+  // CONFIGURAÇÃO DO SUPABASE
+  // ============================================================
+  var SUPABASE_URL = "https://jvvbkbozfttbyhfhccdm.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_d5FHNjUvRuxgAfnDvM4HEQ_XSz6j5kt";
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  var META_SELOS = 9;
+  var LOGIN_USUARIO = "Erike Brusnney";
+  var LOGIN_SENHA = "LavaSelo1";
+
+  var servicoSelecionado = null;
+  var estaLogado = false;
+
+  // ---------- Util ----------
+  function pad(n){ return n.toString().padStart(2,'0'); }
+
+  function formatarCpfInput(v){
+    v = v.replace(/\D/g,'').slice(0,11);
+    if(v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+    else if(v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+    else if(v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+    return v;
+  }
+
+  function cpfValido(cpfFormatado){
+    var cpf = cpfFormatado.replace(/\D/g,'');
+    if(cpf.length !== 11) return false;
+    if(/^(\d)\1{10}$/.test(cpf)) return false;
+    var soma = 0, resto;
+    for(var i=1;i<=9;i++) soma += parseInt(cpf.substring(i-1,i)) * (11-i);
+    resto = (soma*10) % 11; if(resto===10||resto===11) resto=0;
+    if(resto !== parseInt(cpf.substring(9,10))) return false;
+    soma=0;
+    for(var j=1;j<=10;j++) soma += parseInt(cpf.substring(j-1,j)) * (12-j);
+    resto = (soma*10) % 11; if(resto===10||resto===11) resto=0;
+    if(resto !== parseInt(cpf.substring(10,11))) return false;
+    return true;
+  }
+
+  function ehDiaPromocional(d){
+    var dia = d.getDay();
+    return dia === 2 || dia === 3;
+  }
+
+  function agora(){ return new Date(); }
+
+  function mostrarToast(msg, erro){
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.toggle('erro', !!erro);
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3200);
+  }
+
+  // ============================================================
+  // ACESSO AO BANCO (Supabase)
+  // ============================================================
+  async function inserirCheckin(cpf, servico){
+    var d = agora();
+    var { data, error } = await sb.from('checkins').insert([{
+      cpf: cpf,
+      servico: servico,
+      data_iso: d.toISOString()
+    }]).select();
+    if(error) throw error;
+    return data[0];
+  }
+
+  async function buscarCheckins(){
+    var { data, error } = await sb.from('checkins').select('*').order('data_iso', { ascending:false });
+    if(error) throw error;
+    return data;
+  }
+
+  async function buscarResgates(){
+    var { data, error } = await sb.from('resgates').select('*');
+    if(error) throw error;
+    var mapa = {};
+    data.forEach(function(r){ mapa[r.cpf] = r.resgatado_em; });
+    return mapa;
+  }
+
+  async function marcarResgate(cpf){
+    var { error } = await sb.from('resgates').upsert({
+      cpf: cpf,
+      resgatado_em: agora().toISOString()
+    });
+    if(error) throw error;
+  }
+
+  // ============================================================
+  // TELA CLIENTE
+  // ============================================================
+  var inputCpf = document.getElementById('inputCpf');
+  var erroCpf = document.getElementById('erroCpf');
+  var erroGeral = document.getElementById('erroGeral');
+  var optLavagem = document.getElementById('optLavagem');
+  var optSecagem = document.getElementById('optSecagem');
+  var avisoPromo = document.getElementById('avisoPromo');
+  var btnValidar = document.getElementById('btnValidar');
+  var cartaoForm = document.getElementById('cartaoForm');
+  var resultadoOk = document.getElementById('resultadoOk');
+  var resultadoTitulo = document.getElementById('resultadoTitulo');
+  var resultadoTexto = document.getElementById('resultadoTexto');
+  var resultadoContagem = document.getElementById('resultadoContagem');
+
+  var diaEhPromo = ehDiaPromocional(agora());
+  if(diaEhPromo){
+    optSecagem.classList.add('bloqueado');
+    avisoPromo.classList.add('show');
+  }
+
+  inputCpf.addEventListener('input', function(){
+    var pos = this.selectionStart;
+    var antes = this.value.length;
+    this.value = formatarCpfInput(this.value);
+    var depois = this.value.length;
+    this.selectionEnd = pos + (depois - antes);
+    erroCpf.classList.remove('show');
+    atualizarBotao();
+  });
+
+  function selecionarServico(tipo, el){
+    if(el.classList.contains('bloqueado')) return;
+    servicoSelecionado = tipo;
+    optLavagem.classList.toggle('sel', tipo === 'Lavagem');
+    optSecagem.classList.toggle('sel', tipo === 'Secagem');
+    atualizarBotao();
+  }
+  optLavagem.addEventListener('click', function(){ selecionarServico('Lavagem', optLavagem); });
+  optSecagem.addEventListener('click', function(){ selecionarServico('Secagem', optSecagem); });
+
+  function atualizarBotao(){
+    var cpfOk = inputCpf.value.replace(/\D/g,'').length === 11;
+    btnValidar.disabled = !(cpfOk && servicoSelecionado);
+  }
+
+  btnValidar.addEventListener('click', async function(){
+    erroGeral.classList.remove('show');
+    if(!cpfValido(inputCpf.value)){
+      erroCpf.classList.add('show');
+      return;
+    }
+    // proteção extra: revalida regra de terça/quarta no momento do clique
+    if(ehDiaPromocional(agora()) && servicoSelecionado === 'Secagem'){
+      erroGeral.textContent = 'Hoje é dia promocional — Secagem não pode ser carimbada às terças e quartas.';
+      erroGeral.classList.add('show');
+      return;
+    }
+
+    btnValidar.disabled = true;
+    btnValidar.innerHTML = '<span>⏳</span> Registrando…';
+
+    try{
+      var novo = await inserirCheckin(inputCpf.value, servicoSelecionado);
+      var d = new Date(novo.data_iso);
+      var dataLabel = pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear();
+      var horaLabel = pad(d.getHours())+':'+pad(d.getMinutes());
+
+      var resgates = await buscarResgates();
+      var todos = await buscarCheckins();
+      var ultimoResgate = resgates[novo.cpf] ? new Date(resgates[novo.cpf]) : null;
+      var contagem = todos.filter(function(c){
+        if(c.cpf !== novo.cpf) return false;
+        if(ultimoResgate && new Date(c.data_iso) <= ultimoResgate) return false;
+        return true;
+      }).length;
+
+      resultadoTitulo.textContent = 'Selo carimbado!';
+      resultadoTexto.textContent = novo.servico + ' registrada com sucesso em ' + dataLabel + ' às ' + horaLabel + '.';
+      if(contagem >= META_SELOS){
+        resultadoContagem.textContent = '🎉 Você completou ' + META_SELOS + ' selos! Fale com a equipe para resgatar seu serviço gratuito.';
+      } else {
+        resultadoContagem.textContent = 'Selo ' + contagem + ' de ' + META_SELOS + ' para o próximo serviço gratuito.';
+      }
+
+      cartaoForm.style.display = 'none';
+      resultadoOk.classList.add('show');
+    }catch(e){
+      console.error(e);
+      erroGeral.textContent = 'Não foi possível registrar agora. Verifique sua internet e tente novamente.';
+      erroGeral.classList.add('show');
+    }finally{
+      btnValidar.disabled = false;
+      btnValidar.innerHTML = '<span>🔖</span> Validar selo';
+    }
+  });
+
+  document.getElementById('btnNovoCheckin').addEventListener('click', function(){
+    inputCpf.value = '';
+    servicoSelecionado = null;
+    optLavagem.classList.remove('sel');
+    optSecagem.classList.remove('sel');
+    erroCpf.classList.remove('show');
+    erroGeral.classList.remove('show');
+    atualizarBotao();
+    resultadoOk.classList.remove('show');
+    cartaoForm.style.display = 'block';
+  });
+
+  // ============================================================
+  // NAVEGAÇÃO ENTRE TELAS
+  // ============================================================
+  var telaCliente = document.getElementById('telaCliente');
+  var telaLogin = document.getElementById('telaLogin');
+  var telaPainel = document.getElementById('telaPainel');
+  var btnTopoAcao = document.getElementById('btnTopoAcao');
+
+  function mostrarTela(nome){
+    telaCliente.style.display = nome === 'cliente' ? 'block' : 'none';
+    telaLogin.style.display = nome === 'login' ? 'block' : 'none';
+    telaPainel.style.display = nome === 'painel' ? 'block' : 'none';
+
+    if(nome === 'painel'){
+      btnTopoAcao.textContent = 'Sair';
+    } else if(nome === 'login'){
+      btnTopoAcao.textContent = '← Voltar';
+    } else {
+      btnTopoAcao.textContent = 'Acesso à área interna';
+    }
+  }
+
+  document.getElementById('linkAreaInterna').addEventListener('click', function(){
+    mostrarTela('login');
+  });
+
+  btnTopoAcao.addEventListener('click', function(){
+    if(estaLogado){
+      estaLogado = false;
+      mostrarTela('cliente');
+    } else if(telaLogin.style.display === 'block'){
+      mostrarTela('cliente');
+    } else {
+      mostrarTela('login');
+    }
+  });
+
+  // ============================================================
+  // LOGIN
+  // ============================================================
+  var loginErro = document.getElementById('loginErro');
+
+  document.getElementById('btnEntrar').addEventListener('click', tentarLogin);
+  document.getElementById('loginPass').addEventListener('keydown', function(e){ if(e.key==='Enter') tentarLogin(); });
+  document.getElementById('loginUser').addEventListener('keydown', function(e){ if(e.key==='Enter') tentarLogin(); });
+
+  async function tentarLogin(){
+    var u = document.getElementById('loginUser').value.trim();
+    var p = document.getElementById('loginPass').value;
+    if(u === LOGIN_USUARIO && p === LOGIN_SENHA){
+      loginErro.classList.remove('show');
+      estaLogado = true;
+      document.getElementById('loginUser').value = '';
+      document.getElementById('loginPass').value = '';
+      mostrarTela('painel');
+      await carregarPainel();
+    } else {
+      loginErro.classList.add('show');
+    }
+  }
+
+  // ============================================================
+  // PAINEL — ABAS
+  // ============================================================
+  var abas = document.querySelectorAll('.aba');
+  abas.forEach(function(aba){
+    aba.addEventListener('click', function(){
+      abas.forEach(function(a){ a.classList.remove('ativa'); });
+      document.querySelectorAll('.secao').forEach(function(s){ s.classList.remove('ativa'); });
+      aba.classList.add('ativa');
+      document.getElementById(aba.dataset.secao).classList.add('ativa');
+    });
+  });
+
+  // ============================================================
+  // PAINEL — LISTA / FILTROS
+  // ============================================================
+  var periodoAtivo = 'semana';
+  var filtros = document.querySelectorAll('.filtro-btn');
+  filtros.forEach(function(f){
+    f.addEventListener('click', function(){
+      filtros.forEach(function(x){ x.classList.remove('ativo'); });
+      f.classList.add('ativo');
+      periodoAtivo = f.dataset.periodo;
+      renderizarLista();
+    });
+  });
+
+  document.getElementById('btnAtualizarLista').addEventListener('click', async function(){
+    await carregarPainel();
+    mostrarToast('Painel atualizado.');
+  });
+
+  function inicioDaSemana(d){
+    var data = new Date(d);
+    var dia = data.getDay();
+    var diff = (dia === 0 ? -6 : 1) - dia;
+    data.setDate(data.getDate() + diff);
+    data.setHours(0,0,0,0);
+    return data;
+  }
+  function inicioDoMes(d){
+    var data = new Date(d.getFullYear(), d.getMonth(), 1);
+    data.setHours(0,0,0,0);
+    return data;
+  }
+
+  var todosCheckins = [];
+
+  async function carregarPainel(){
+    try{
+      todosCheckins = await buscarCheckins();
+      renderizarLista();
+      await renderizarPodio();
+    }catch(e){
+      console.error(e);
+      mostrarToast('Não foi possível carregar os dados. Verifique sua internet.', true);
+    }
+  }
+
+  function dataLabelDe(iso){
+    var d = new Date(iso);
+    return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear();
+  }
+  function horaLabelDe(iso){
+    var d = new Date(iso);
+    return pad(d.getHours())+':'+pad(d.getMinutes());
+  }
+
+  function renderizarLista(){
+    var agoraD = agora();
+    var lista = todosCheckins.slice().sort(function(a,b){ return new Date(b.data_iso) - new Date(a.data_iso); });
+
+    if(periodoAtivo === 'semana'){
+      var iniSem = inicioDaSemana(agoraD);
+      lista = lista.filter(function(c){ return new Date(c.data_iso) >= iniSem; });
+    } else if(periodoAtivo === 'mes'){
+      var iniMes = inicioDoMes(agoraD);
+      lista = lista.filter(function(c){ return new Date(c.data_iso) >= iniMes; });
+    }
+
+    var totalLavagem = lista.filter(function(c){ return c.servico === 'Lavagem'; }).length;
+    var totalSecagem = lista.filter(function(c){ return c.servico === 'Secagem'; }).length;
+    var cpfsUnicos = new Set(lista.map(function(c){ return c.cpf; })).size;
+
+    document.getElementById('statsGrade').innerHTML =
+      statCard(lista.length, 'Check-ins') +
+      statCard(totalLavagem, 'Lavagens') +
+      statCard(totalSecagem, 'Secagens') +
+      statCard(cpfsUnicos, 'Clientes únicos');
+
+    var corpo = document.getElementById('corpoTabela');
+    var vazio = document.getElementById('vazioLista');
+    if(lista.length === 0){
+      corpo.innerHTML = '';
+      vazio.style.display = 'block';
+    } else {
+      vazio.style.display = 'none';
+      corpo.innerHTML = lista.map(function(c){
+        return '<tr>'+
+          '<td class="cpf-mono">'+c.cpf+'</td>'+
+          '<td><span class="tag-serv '+(c.servico==='Lavagem'?'lavagem':'secagem')+'">'+c.servico+'</span></td>'+
+          '<td>'+dataLabelDe(c.data_iso)+'</td>'+
+          '<td>'+horaLabelDe(c.data_iso)+'</td>'+
+        '</tr>';
+      }).join('');
+    }
+  }
+
+  function statCard(num, lbl){
+    return '<div class="stat-card"><div class="num">'+num+'</div><div class="lbl">'+lbl+'</div></div>';
+  }
+
+  // ============================================================
+  // PAINEL — PÓDIO
+  // ============================================================
+  async function renderizarPodio(){
+    var resgates = await buscarResgates();
+
+    var porCpf = {};
+    todosCheckins.forEach(function(c){
+      var ultimoResgate = resgates[c.cpf] ? new Date(resgates[c.cpf]) : null;
+      if(ultimoResgate && new Date(c.data_iso) <= ultimoResgate) return;
+      if(!porCpf[c.cpf]) porCpf[c.cpf] = [];
+      porCpf[c.cpf].push(c);
+    });
+
+    var entradas = Object.keys(porCpf).map(function(cpf){
+      var itens = porCpf[cpf].sort(function(a,b){ return new Date(a.data_iso) - new Date(b.data_iso); });
+      return { cpf: cpf, qtd: itens.length, ultima: itens[itens.length-1] };
+    });
+
+    entradas.sort(function(a,b){ return b.qtd - a.qtd; });
+
+    var grade = document.getElementById('podioGrade');
+    var vazio = document.getElementById('vazioPodio');
+
+    if(entradas.length === 0){
+      grade.innerHTML = '';
+      vazio.style.display = 'block';
+      return;
+    }
+    vazio.style.display = 'none';
+
+    grade.innerHTML = entradas.map(function(e, i){
+      var pronto = e.qtd >= META_SELOS;
+      var pct = Math.min(100, Math.round((e.qtd / META_SELOS) * 100));
+      return '<div class="podio-item '+(pronto?'pronto':'')+'">'+
+        '<div class="podio-pos">'+(i+1)+'º</div>'+
+        '<div class="podio-info">'+
+          '<div class="cpf">'+e.cpf+'</div>'+
+          '<div class="progresso-txt">'+e.qtd+' de '+META_SELOS+' selos · última visita '+dataLabelDe(e.ultima.data_iso)+'</div>'+
+          '<div class="barra-bg"><div class="barra-fill" style="width:'+pct+'%;"></div></div>'+
+        '</div>'+
+        (pronto
+          ? '<button class="btn-resgatar" data-cpf="'+e.cpf+'">Marcar resgatado</button>'
+          : '<div class="selo-fundo">'+e.qtd+'/'+META_SELOS+'</div>'
+        ) +
+      '</div>';
+    }).join('');
+
+    grade.querySelectorAll('.btn-resgatar').forEach(function(btn){
+      btn.addEventListener('click', async function(){
+        var cpf = btn.dataset.cpf;
+        btn.disabled = true;
+        btn.textContent = 'Salvando…';
+        try{
+          await marcarResgate(cpf);
+          await carregarPainel();
+          mostrarToast('Resgate registrado. Contagem reiniciada para ' + cpf + '.');
+        }catch(e){
+          console.error(e);
+          mostrarToast('Não foi possível registrar o resgate. Tente novamente.', true);
+          btn.disabled = false;
+          btn.textContent = 'Marcar resgatado';
+        }
+      });
+    });
+  }
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app').classList.add('pronto');
+  mostrarTela('cliente');
+
+})();
+</script>
+
+</body>
+</html>
