@@ -71,15 +71,8 @@
     border-bottom:1px solid var(--azul-linha);
   }
   .marca{ display:flex; align-items:center; gap:12px; }
-  .marca-icone{
-    width:44px; height:44px; border-radius:50%; flex-shrink:0;
-    background:radial-gradient(circle at 35% 30%, var(--agua), var(--azul-painel));
-    display:flex; align-items:center; justify-content:center;
-    font-family:var(--display); font-weight:700; color:#fff; font-size:16px;
-    border:1.5px solid var(--agua);
-  }
-  .marca-nome{ font-family:var(--display); font-size:17px; font-weight:600; letter-spacing:.01em; line-height:1.1; }
-  .marca-sub{ font-size:11px; color:var(--texto-fraco); letter-spacing:.08em; text-transform:uppercase; margin-top:-2px;}
+  .marca-nome{ font-family:var(--display); font-size:19px; font-weight:600; letter-spacing:.01em; line-height:1.1; }
+  .marca-sub{ font-size:11px; color:var(--texto-fraco); letter-spacing:.08em; text-transform:uppercase; margin-top:1px;}
 
   .nav-link{
     background:none; border:1px solid var(--azul-linha); color:var(--texto-fraco);
@@ -259,8 +252,8 @@
   tr:last-child td{ border-bottom:none; }
   tr:hover td{ background:rgba(43,127,255,.05); }
   .tag-serv{ padding:4px 10px; border-radius:100px; font-size:11.5px; font-weight:600; }
-  .tag-serv.lavagem{ background:rgba(43,127,255,.15); color:var(--agua-clara); }
-  .tag-serv.secagem{ background:rgba(43,127,255,.15); color:var(--agua-clara); }
+  .tag-serv.lavagem{ background:rgba(43,127,255,.18); color:#9CC4FF; }
+  .tag-serv.secagem{ background:rgba(255,122,40,.20); color:#FFB077; }
   .cpf-mono{ font-family:var(--mono); letter-spacing:.02em; }
   .vazio{ padding:50px 20px; text-align:center; color:var(--texto-fraco); font-size:14px; }
 
@@ -323,7 +316,6 @@
 
   <div class="topo">
     <div class="marca">
-      <div class="marca-icone">LF</div>
       <div>
         <div class="marca-nome">Lavateria Av. Boa Sorte</div>
         <div class="marca-sub">cartão fidelidade</div>
@@ -813,8 +805,8 @@
 
     document.getElementById('statsGrade').innerHTML =
       statCard(lista.length, 'Check-ins') +
-      statCard(totalLavagem, 'Lavagens') +
-      statCard(totalSecagem, 'Secagens') +
+      statCard(totalLavagem, 'Lavagens', '#9CC4FF') +
+      statCard(totalSecagem, 'Secagens', '#FFB077') +
       statCard(cpfsUnicos, 'Clientes únicos');
 
     var corpo = document.getElementById('corpoTabela');
@@ -835,8 +827,9 @@
     }
   }
 
-  function statCard(num, lbl){
-    return '<div class="stat-card"><div class="num">'+num+'</div><div class="lbl">'+lbl+'</div></div>';
+  function statCard(num, lbl, cor){
+    var estilo = cor ? ' style="color:'+cor+';"' : '';
+    return '<div class="stat-card"><div class="num"'+estilo+'>'+num+'</div><div class="lbl">'+lbl+'</div></div>';
   }
 
   // ============================================================
