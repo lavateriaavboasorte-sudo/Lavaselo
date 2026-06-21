@@ -329,7 +329,7 @@
       <div class="selo-hero">
         <span class="eyebrow">Validação de serviço</span>
         <h1>Lavou ou secou?<br><em>Carimbe seu selo.</em></h1>
-        <p>Informe seu CPF e o serviço realizado hoje. A cada 9 selos completos, um serviço é por nossa conta.</p>
+        <p>Informe seu CPF e o serviço realizado hoje. A cada 10 selos completos, um serviço é por nossa conta.</p>
       </div>
 
       <div class="cartao" id="cartaoForm">
@@ -401,7 +401,7 @@
 
       <div class="abas">
         <button class="aba ativa" data-secao="secaoLista">Check-ins</button>
-        <button class="aba" data-secao="secaoPodio">Pódio (9 selos)</button>
+        <button class="aba" data-secao="secaoPodio">Pódio (10 selos)</button>
       </div>
 
       <div class="secao ativa" id="secaoLista">
@@ -427,7 +427,7 @@
 
       <div class="secao" id="secaoPodio">
         <p style="color:var(--texto-fraco); font-size:13.5px; margin-bottom:20px; line-height:1.6;">
-          Cada CPF avança a cada selo novo. Ao completar <strong style="color:var(--premio);">9 selos</strong>, o cliente está pronto para o serviço gratuito. Marque como resgatado para reiniciar a contagem dele.
+          Cada CPF avança a cada selo novo. Ao completar <strong style="color:var(--premio);">10 selos</strong>, o cliente está pronto para o serviço gratuito. Marque como resgatado para reiniciar a contagem dele.
         </p>
         <div class="podio-grade" id="podioGrade"></div>
         <div class="vazio" id="vazioPodio" style="display:none;">Nenhum cliente com selos registrados ainda.</div>
@@ -463,7 +463,7 @@
 
   var sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  var META_SELOS = 9;
+  var META_SELOS = 10;
   var LOGIN_USUARIO = "Erike Brusnney";
   var LOGIN_SENHA = "LavaSelo1";
 
