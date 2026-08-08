@@ -439,29 +439,30 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
 
   // ============================================================
-  // CONFIGURAÇÃO DO SUPABASE
+  // CONEXÃO COM A PLANILHA (Google Apps Script)
+  // ------------------------------------------------------------
+  // Cole abaixo, entre as aspas, a URL que o Apps Script gerou
+  // ao publicar o app da web (termina com /exec)
   // ============================================================
-  var SUPABASE_URL = "https://jvvbkbozfttbyhfhccdm.supabase.co";
-  var SUPABASE_KEY = "sb_publishable_d5FHNjUvRuxgAfnDvM4HEQ_XSz6j5kt";
+  var API_URL = "https://script.google.com/macros/s/AKfycbzsTjfQSwbQ9tKDSWr8wH3g6HNeJHPz60q2_UcBgpsA6OQQ7UbtBK7SZp13YtGonPKDZg/exec";
 
-  // Verifica se a biblioteca do Supabase carregou de verdade
-  if(typeof supabase === 'undefined' || !supabase.createClient){
-    document.getElementById('loading').innerHTML =
-      '<div style="text-align:center; max-width:340px; padding:0 20px;">'+
-      '<div style="font-size:40px; margin-bottom:14px;">📡</div>'+
-      '<p style="color:#EAF4F6; font-size:16px; margin-bottom:10px; font-family:Georgia,serif;">Falha ao conectar</p>'+
-      '<p style="color:#9FC2D1; font-size:13.5px; line-height:1.6;">Não foi possível carregar o sistema. Verifique sua conexão com a internet e recarregue a página.</p>'+
-      '<button onclick="location.reload()" style="margin-top:18px; background:#2FA9C9; color:#0E2A3D; border:none; padding:11px 22px; border-radius:100px; font-size:14px; font-weight:700; cursor:pointer;">Recarregar</button>'+
-      '</div>';
-    return;
+  // Envia um pedido para a planilha e devolve a resposta
+  async function chamar(dados){
+    var resp = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(dados),
+      redirect: 'follow'
+    });
+    if(!resp.ok) throw new Error('Falha na conexão (' + resp.status + ')');
+    var json = await resp.json();
+    if(json && json.erro) throw new Error(json.erro);
+    return json;
   }
-
-  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   var META_SELOS = 10;
   var LOGIN_USUARIO = "Erike Brusnney";
@@ -512,39 +513,27 @@
   }
 
   // ============================================================
-  // ACESSO AO BANCO (Supabase)
+  // ACESSO AOS DADOS (planilha do Google)
   // ============================================================
+
+  // Registra o selo e já devolve a contagem atualizada do cliente
   async function inserirCheckin(cpf, servico){
-    var d = agora();
-    var { data, error } = await sb.from('checkins').insert([{
-      cpf: cpf,
-      servico: servico,
-      data_iso: d.toISOString()
-    }]).select();
-    if(error) throw error;
-    return data[0];
+    return await chamar({ acao:'checkin', cpf: cpf, servico: servico });
   }
 
-  async function buscarCheckins(){
-    var { data, error } = await sb.from('checkins').select('*').order('data_iso', { ascending:false });
-    if(error) throw error;
-    return data;
-  }
-
-  async function buscarResgates(){
-    var { data, error } = await sb.from('resgates').select('*');
-    if(error) throw error;
-    var mapa = {};
-    data.forEach(function(r){ mapa[r.cpf] = r.resgatado_em; });
-    return mapa;
+  // Traz tudo de uma vez: check-ins e resgates
+  async function buscarTudo(){
+    var d = await chamar({ acao:'listar' });
+    return {
+      checkins: (d.checkins || []).sort(function(a,b){
+        return new Date(b.data_iso) - new Date(a.data_iso);
+      }),
+      resgates: d.resgates || {}
+    };
   }
 
   async function marcarResgate(cpf){
-    var { error } = await sb.from('resgates').upsert({
-      cpf: cpf,
-      resgatado_em: agora().toISOString()
-    });
-    if(error) throw error;
+    return await chamar({ acao:'resgate', cpf: cpf });
   }
 
   // ============================================================
@@ -615,15 +604,7 @@
       var d = new Date(novo.data_iso);
       var dataLabel = pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear();
       var horaLabel = pad(d.getHours())+':'+pad(d.getMinutes());
-
-      var resgates = await buscarResgates();
-      var todos = await buscarCheckins();
-      var ultimoResgate = resgates[novo.cpf] ? new Date(resgates[novo.cpf]) : null;
-      var contagem = todos.filter(function(c){
-        if(c.cpf !== novo.cpf) return false;
-        if(ultimoResgate && new Date(c.data_iso) <= ultimoResgate) return false;
-        return true;
-      }).length;
+      var contagem = novo.contagem;
 
       resultadoTitulo.textContent = 'Selo carimbado!';
       resultadoTexto.textContent = novo.servico + ' registrada com sucesso em ' + dataLabel + ' às ' + horaLabel + '.';
@@ -766,12 +747,15 @@
   }
 
   var todosCheckins = [];
+  var todosResgates = {};
 
   async function carregarPainel(){
     try{
-      todosCheckins = await buscarCheckins();
+      var dados = await buscarTudo();
+      todosCheckins = dados.checkins;
+      todosResgates = dados.resgates;
       renderizarLista();
-      await renderizarPodio();
+      renderizarPodio();
     }catch(e){
       console.error(e);
       mostrarToast('Não foi possível carregar os dados. Verifique sua internet.', true);
@@ -835,8 +819,8 @@
   // ============================================================
   // PAINEL — PÓDIO
   // ============================================================
-  async function renderizarPodio(){
-    var resgates = await buscarResgates();
+  function renderizarPodio(){
+    var resgates = todosResgates;
 
     var porCpf = {};
     todosCheckins.forEach(function(c){
@@ -902,6 +886,16 @@
   // ============================================================
   // INIT
   // ============================================================
+  if(API_URL.indexOf('script.google.com') === -1){
+    document.getElementById('loading').innerHTML =
+      '<div style="text-align:center; max-width:360px; padding:0 20px;">'+
+      '<div style="font-size:40px; margin-bottom:14px;">🔗</div>'+
+      '<p style="color:#FFFFFF; font-size:16px; margin-bottom:10px; font-family:Georgia,serif;">Falta conectar a planilha</p>'+
+      '<p style="color:#B8D4FF; font-size:13.5px; line-height:1.6;">Abra o arquivo index.html e cole a URL do Apps Script na linha API_URL.</p>'+
+      '</div>';
+    return;
+  }
+
   document.getElementById('loading').style.display = 'none';
   document.getElementById('app').classList.add('pronto');
   mostrarTela('cliente');
