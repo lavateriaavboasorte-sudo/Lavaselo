@@ -137,6 +137,84 @@
   .servico-opt .nome{ font-weight:600; font-size:14.5px; }
   .servico-opt.bloqueado{ opacity:.35; cursor:not-allowed; }
   .servico-opt.bloqueado .nome::after{ content:' 🔒'; font-size:11px; }
+  .servico-opt{ padding:18px 10px 14px; }
+
+  /* Contador de quantidade */
+  .qtd{ display:flex; align-items:center; justify-content:center; gap:8px; margin-top:12px; }
+  .qtd-btn{
+    width:38px; height:38px; border-radius:50%; border:1.5px solid var(--azul-linha);
+    background:rgba(255,255,255,.04); color:#fff; font-size:20px; font-weight:700; line-height:1;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; font-family:var(--corpo);
+    transition:.12s;
+  }
+  .qtd-btn:active:not(:disabled){ transform:scale(.9); }
+  .qtd-btn:disabled{ opacity:.3; cursor:not-allowed; }
+  .servico-opt.sel .qtd-btn:not(:disabled){ border-color:var(--dourado); }
+  .qtd-num{ min-width:26px; text-align:center; font-family:var(--mono); font-size:20px; font-weight:700; }
+  .servico-opt.sel .qtd-num{ color:var(--dourado); }
+  .dica-qtd{ font-size:12px; color:var(--texto-fraco); margin-top:10px; text-align:center; position:relative; z-index:1; }
+
+  /* Botão "Meus selos" na tela do cliente */
+  .btn-meus-selos{
+    width:100%; margin-top:16px; background:transparent; color:#fff;
+    border:1.5px solid var(--agua); padding:15px; border-radius:12px;
+    font-size:15px; font-weight:600; cursor:pointer; font-family:var(--corpo);
+    display:flex; align-items:center; justify-content:center; gap:9px; transition:.15s;
+  }
+  .btn-meus-selos:hover{ background:rgba(43,127,255,.12); }
+  .btn-meus-selos:active{ transform:scale(.98); }
+
+  /* Cartão de selos (10 bolinhas) */
+  .selos-grade{
+    display:grid; grid-template-columns:repeat(5, 1fr); gap:10px;
+    margin:18px auto 0; max-width:340px;
+  }
+  .selo{
+    aspect-ratio:1; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:19px; font-family:var(--mono); font-weight:700;
+  }
+  .selo.vazio{ border:2px dashed var(--azul-linha); color:rgba(184,212,255,.45); font-size:13px; }
+  .selo.cheio{ animation:carimbar .35s cubic-bezier(.34,1.56,.64,1) backwards; }
+  .selo.cheio.lav{ background:rgba(43,127,255,.28); border:2px solid var(--agua); }
+  .selo.cheio.sec{ background:rgba(255,122,40,.24); border:2px solid #FF8A3D; }
+  .selos-grade.completo .selo.cheio{ box-shadow:0 0 0 3px rgba(242,183,5,.35); }
+  @keyframes carimbar{ from{ transform:scale(1.8); opacity:0; } to{ transform:scale(1); opacity:1; } }
+
+  .msg-progresso{
+    margin:18px auto 0; max-width:400px; padding:14px 16px; border-radius:12px;
+    background:rgba(43,127,255,.14); border:1px solid var(--azul-linha);
+    color:#fff; font-size:15.5px; font-weight:600; line-height:1.5; text-align:center;
+  }
+  .msg-progresso.liberado{ background:rgba(242,183,5,.14); border-color:var(--dourado); color:#FFE08A; }
+
+  .resultado-acoes{ display:flex; flex-direction:column; align-items:center; gap:4px; margin-top:8px; }
+  .resultado-acoes .btn-meus-selos{ max-width:320px; margin-top:18px; }
+  .resultado-acoes .btn-novo{ margin-top:10px; }
+
+  /* Tela "Meus selos" */
+  .cartao-resumo{ text-align:center; }
+  .resumo-topo{ display:flex; justify-content:space-between; align-items:center; position:relative; z-index:1; }
+  .resumo-topo .eyebrow{ margin-bottom:0; }
+  .resumo-topo .cpf-mono{ font-size:13px; color:var(--texto-fraco); }
+  .stats-cliente{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:20px; position:relative; z-index:1; }
+  .stat-mini{ background:var(--azul-fundo); border:1px solid var(--azul-linha); border-radius:12px; padding:12px 6px; }
+  .stat-mini .num{ font-family:var(--display); font-size:24px; font-weight:700; color:#fff; }
+  .stat-mini .lbl{ font-size:10.5px; color:var(--texto-fraco); text-transform:uppercase; letter-spacing:.04em; margin-top:2px; line-height:1.3; }
+  .hist-h3{ font-family:var(--display); font-size:20px; font-weight:600; margin:34px 0 14px; }
+  .hist-cartao{ background:var(--azul-painel); border:1px solid var(--azul-linha); border-radius:14px; padding:14px 16px; margin-bottom:12px; }
+  .hist-cartao.liberado{ border-color:var(--dourado); }
+  .hist-cartao.usado{ opacity:.75; }
+  .hist-topo{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px; }
+  .hist-titulo{ font-weight:700; font-size:14.5px; }
+  .hist-status{ font-size:12px; color:var(--texto-fraco); text-align:right; }
+  .hist-cartao.liberado .hist-status{ color:var(--dourado); font-weight:600; }
+  .hist-lista{ list-style:none; }
+  .hist-lista li{ display:flex; align-items:center; gap:10px; padding:8px 0; border-top:1px solid rgba(30,75,192,.5); font-size:14px; }
+  .hist-ic{ width:22px; text-align:center; }
+  .hist-serv{ flex:1; }
+  .hist-data{ font-family:var(--mono); font-size:12px; color:var(--texto-fraco); }
+  .consulta-vazia{ text-align:center; padding:30px 10px; color:var(--texto-fraco); line-height:1.6; }
+  .consulta-vazia strong{ color:#fff; display:block; font-size:17px; margin-bottom:6px; }
 
   .aviso-promo{
     margin-top:14px; padding:11px 14px; background:rgba(232,34,10,.1);
@@ -340,17 +418,28 @@
         </div>
 
         <div class="campo">
-          <label>Serviço realizado</label>
+          <label>Quantos serviços você fez?</label>
           <div class="servicos">
             <div class="servico-opt" data-servico="Lavagem" id="optLavagem">
               <span class="ic">💧</span>
               <span class="nome">Lavagem</span>
+              <div class="qtd">
+                <button type="button" class="qtd-btn" data-acao="menos" aria-label="Menos uma lavagem">−</button>
+                <span class="qtd-num" id="qtdLavagem" aria-live="polite">0</span>
+                <button type="button" class="qtd-btn" data-acao="mais" aria-label="Mais uma lavagem">+</button>
+              </div>
             </div>
             <div class="servico-opt" data-servico="Secagem" id="optSecagem">
               <span class="ic">🔥</span>
               <span class="nome">Secagem</span>
+              <div class="qtd">
+                <button type="button" class="qtd-btn" data-acao="menos" aria-label="Menos uma secagem">−</button>
+                <span class="qtd-num" id="qtdSecagem" aria-live="polite">0</span>
+                <button type="button" class="qtd-btn" data-acao="mais" aria-label="Mais uma secagem">+</button>
+              </div>
             </div>
           </div>
+          <div class="dica-qtd">Toque em <strong>+</strong> uma vez para cada máquina que você usou.</div>
           <div class="aviso-promo" id="avisoPromo">
             Hoje é dia promocional — apenas <strong>Lavagem</strong> pode ser carimbada. Secagem fica disponível nos outros dias da semana.
           </div>
@@ -363,16 +452,50 @@
         <div class="erro-geral" id="erroGeral"></div>
       </div>
 
+      <button class="btn-meus-selos" id="btnAbrirMeusSelos">⭐ Ver meus selos</button>
+
       <div class="resultado" id="resultadoOk">
         <div class="carimbo-visual"><span>OK</span></div>
         <h2 id="resultadoTitulo">Selo carimbado!</h2>
         <p id="resultadoTexto">Seu serviço foi registrado com sucesso.</p>
-        <p class="contagem" id="resultadoContagem"></p>
-        <button class="btn-novo" id="btnNovoCheckin">Carimbar outro selo</button>
+        <div id="resultadoCartao"></div>
+        <div class="msg-progresso" id="resultadoContagem"></div>
+        <div class="resultado-acoes">
+          <button class="btn-meus-selos" id="btnVerHistorico">📋 Ver meu histórico completo</button>
+          <button class="btn-novo" id="btnNovoCheckin">Carimbar outro selo</button>
+        </div>
       </div>
 
       <div class="rodape-cliente">
         <button id="linkAreaInterna">Acesso à área interna</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="telaConsulta" style="display:none;">
+    <div class="container">
+      <div class="selo-hero">
+        <span class="eyebrow">Meu cartão fidelidade</span>
+        <h1>Quantos selos<br><em>eu tenho?</em></h1>
+        <p>Digite seu CPF para ver seu cartão, os serviços que você fez e seus vouchers.</p>
+      </div>
+
+      <div class="cartao" id="consultaForm">
+        <div class="campo">
+          <label for="consultaCpf">Seu CPF</label>
+          <input type="text" id="consultaCpf" placeholder="000.000.000-00" maxlength="14" inputmode="numeric">
+          <div class="erro-msg" id="erroConsultaCpf">CPF inválido. Confira os números e tente de novo.</div>
+        </div>
+        <button class="btn-validar" id="btnConsultar" disabled>
+          <span>⭐</span> Ver meu cartão
+        </button>
+        <div class="erro-geral" id="erroConsulta"></div>
+      </div>
+
+      <div id="consultaResultado" style="display:none;" aria-live="polite"></div>
+
+      <div class="rodape-cliente">
+        <button id="btnVoltarCarimbo">← Voltar para carimbar selo</button>
       </div>
     </div>
   </div>
@@ -427,7 +550,7 @@
 
       <div class="secao" id="secaoPodio">
         <p style="color:var(--texto-fraco); font-size:13.5px; margin-bottom:20px; line-height:1.6;">
-          Cada CPF avança a cada selo novo. Ao completar <strong style="color:var(--premio);">10 selos</strong>, o cliente está pronto para o serviço gratuito. Marque como resgatado para reiniciar a contagem dele.
+          Ao completar <strong style="color:var(--premio);">10 selos</strong>, o cliente ganha um voucher de serviço grátis. Ao dar baixa, só 10 selos são usados — o que passar de 10 continua valendo no próximo cartão.
         </p>
         <div class="podio-grade" id="podioGrade"></div>
         <div class="vazio" id="vazioPodio" style="display:none;">Nenhum cliente com selos registrados ainda.</div>
@@ -468,7 +591,6 @@
   var LOGIN_USUARIO = "Erike Brusnney";
   var LOGIN_SENHA = "LavaSelo1";
 
-  var servicoSelecionado = null;
   var estaLogado = false;
 
   // ---------- Util ----------
@@ -516,24 +638,109 @@
   // ACESSO AOS DADOS (planilha do Google)
   // ============================================================
 
-  // Registra o selo e já devolve a contagem atualizada do cliente
-  async function inserirCheckin(cpf, servico){
-    return await chamar({ acao:'checkin', cpf: cpf, servico: servico });
+  // Registra vários selos de uma vez e devolve o resumo do cliente
+  async function inserirCheckin(cpf, itens){
+    return await chamar({ acao:'checkin', cpf: cpf, itens: itens });
   }
 
-  // Traz tudo de uma vez: check-ins e resgates
+  // Resumo de um único cliente (usado na tela "Meus selos")
+  async function consultarCpf(cpf){
+    return await chamar({ acao:'consultar', cpf: cpf });
+  }
+
+  // Traz tudo de uma vez: check-ins e resgates (painel interno)
   async function buscarTudo(){
     var d = await chamar({ acao:'listar' });
+    var resgates = d.resgates || [];
+    if(!Array.isArray(resgates)){
+      // compatibilidade com o formato antigo {cpf: data}
+      resgates = Object.keys(resgates).map(function(cpf){ return { cpf: cpf, resgatado_em: resgates[cpf] }; });
+    }
     return {
       checkins: (d.checkins || []).sort(function(a,b){
         return new Date(b.data_iso) - new Date(a.data_iso);
       }),
-      resgates: d.resgates || {}
+      resgates: resgates
     };
   }
 
   async function marcarResgate(cpf){
     return await chamar({ acao:'resgate', cpf: cpf });
+  }
+
+  // ============================================================
+  // CARTÃO DE SELOS — textos e desenho (usados em várias telas)
+  // ============================================================
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(ch){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch];
+    });
+  }
+
+  function mensagemProgresso(r){
+    var vouchers = Math.floor(r.saldo / META_SELOS);
+    var resto = r.saldo % META_SELOS;
+    var faltam = META_SELOS - resto;
+
+    if(vouchers > 0){
+      var t = vouchers === 1
+        ? '🎉 Cartão completo! Seu voucher de serviço grátis está liberado — é só pedir à equipe.'
+        : '🎉 Você tem ' + vouchers + ' vouchers de serviço grátis liberados — é só pedir à equipe.';
+      if(resto > 0) t += ' E você já tem ' + resto + (resto === 1 ? ' selo' : ' selos') + ' no próximo cartão.';
+      return t;
+    }
+    if(faltam === 1) return 'Mais 1 serviço e você ganha seu voucher de serviço grátis!';
+    if(faltam <= 3)  return 'Mais ' + faltam + ' serviços e você ganha seu voucher de serviço grátis!';
+    return 'Mais ' + faltam + ' serviços e você fecha seu cartão!';
+  }
+
+  function htmlCartaoSelos(r){
+    var usados = r.resgatados || 0;
+    var restantes = (r.historico || []).slice(usados * META_SELOS);
+    var completo = r.saldo >= META_SELOS;
+    var noCartao = completo ? restantes.slice(0, META_SELOS) : restantes;
+
+    var html = '<div class="selos-grade' + (completo ? ' completo' : '') + '">';
+    for(var i = 0; i < META_SELOS; i++){
+      var s = noCartao[i];
+      if(s){
+        var sec = s.servico === 'Secagem';
+        html += '<div class="selo cheio ' + (sec ? 'sec' : 'lav') + '" style="animation-delay:' + (i * 45) + 'ms" title="' + esc(s.servico) + '">' + (sec ? '🔥' : '💧') + '</div>';
+      } else {
+        html += '<div class="selo vazio">' + (i === META_SELOS - 1 ? '🎁' : (i + 1)) + '</div>';
+      }
+    }
+    return html + '</div>';
+  }
+
+  function htmlHistorico(r){
+    var h = r.historico || [];
+    var usados = r.resgatados || 0;
+    if(!h.length) return '';
+
+    var cartoes = [];
+    for(var i = 0; i < h.length; i += META_SELOS) cartoes.push(h.slice(i, i + META_SELOS));
+
+    var out = '';
+    for(var k = cartoes.length - 1; k >= 0; k--){
+      var itens = cartoes[k];
+      var status, cls;
+      if(k < usados){ status = '✓ Voucher já usado'; cls = 'usado'; }
+      else if(itens.length === META_SELOS){ status = '🎁 Voucher liberado'; cls = 'liberado'; }
+      else { status = 'Em andamento · ' + itens.length + (itens.length === 1 ? ' selo' : ' selos'); cls = 'andamento'; }
+
+      out += '<div class="hist-cartao ' + cls + '">' +
+        '<div class="hist-topo"><span class="hist-titulo">Cartão ' + (k + 1) + '</span><span class="hist-status">' + status + '</span></div>' +
+        '<ul class="hist-lista">' +
+          itens.slice().reverse().map(function(s){
+            var sec = s.servico === 'Secagem';
+            return '<li><span class="hist-ic">' + (sec ? '🔥' : '💧') + '</span>' +
+              '<span class="hist-serv">' + esc(s.servico) + '</span>' +
+              '<span class="hist-data">' + dataLabelDe(s.data_iso) + ' · ' + horaLabelDe(s.data_iso) + '</span></li>';
+          }).join('') +
+        '</ul></div>';
+    }
+    return out;
   }
 
   // ============================================================
@@ -547,10 +754,17 @@
   var avisoPromo = document.getElementById('avisoPromo');
   var btnValidar = document.getElementById('btnValidar');
   var cartaoForm = document.getElementById('cartaoForm');
+  var btnAbrirMeusSelos = document.getElementById('btnAbrirMeusSelos');
   var resultadoOk = document.getElementById('resultadoOk');
   var resultadoTitulo = document.getElementById('resultadoTitulo');
   var resultadoTexto = document.getElementById('resultadoTexto');
+  var resultadoCartao = document.getElementById('resultadoCartao');
   var resultadoContagem = document.getElementById('resultadoContagem');
+
+  var MAX_QTD = 10;
+  var qtd = { Lavagem: 0, Secagem: 0 };
+  var opcoes = { Lavagem: optLavagem, Secagem: optSecagem };
+  var ultimoResumo = null;
 
   var diaEhPromo = ehDiaPromocional(agora());
   if(diaEhPromo){
@@ -568,20 +782,53 @@
     atualizarBotao();
   });
 
-  function selecionarServico(tipo, el){
-    if(el.classList.contains('bloqueado')) return;
-    servicoSelecionado = tipo;
-    optLavagem.classList.toggle('sel', tipo === 'Lavagem');
-    optSecagem.classList.toggle('sel', tipo === 'Secagem');
+  function setQtd(servico, n){
+    var el = opcoes[servico];
+    var bloqueado = el.classList.contains('bloqueado');
+    if(bloqueado) n = 0;
+    n = Math.max(0, Math.min(MAX_QTD, n));
+    qtd[servico] = n;
+    document.getElementById('qtd' + servico).textContent = n;
+    el.classList.toggle('sel', n > 0);
+    el.querySelector('[data-acao="menos"]').disabled = bloqueado || n === 0;
+    el.querySelector('[data-acao="mais"]').disabled = bloqueado || n >= MAX_QTD;
     atualizarBotao();
   }
-  optLavagem.addEventListener('click', function(){ selecionarServico('Lavagem', optLavagem); });
-  optSecagem.addEventListener('click', function(){ selecionarServico('Secagem', optSecagem); });
+
+  Object.keys(opcoes).forEach(function(servico){
+    var el = opcoes[servico];
+    el.addEventListener('click', function(ev){
+      if(el.classList.contains('bloqueado')) return;
+      var botao = ev.target.closest('.qtd-btn');
+      if(botao){
+        setQtd(servico, qtd[servico] + (botao.dataset.acao === 'mais' ? 1 : -1));
+        return;
+      }
+      // tocar no card vazio já marca 1
+      if(qtd[servico] === 0) setQtd(servico, 1);
+    });
+  });
+
+  function totalSelecionado(){ return qtd.Lavagem + qtd.Secagem; }
 
   function atualizarBotao(){
     var cpfOk = inputCpf.value.replace(/\D/g,'').length === 11;
-    btnValidar.disabled = !(cpfOk && servicoSelecionado);
+    var total = totalSelecionado();
+    btnValidar.disabled = !(cpfOk && total > 0);
+    btnValidar.innerHTML = '<span>🔖</span> ' +
+      (total > 1 ? 'Carimbar ' + total + ' selos' : total === 1 ? 'Carimbar 1 selo' : 'Validar selo');
   }
+
+  function descreverItens(itens){
+    return itens.map(function(it){
+      var n = it.quantidade;
+      var nome = it.servico === 'Lavagem' ? (n > 1 ? 'lavagens' : 'lavagem') : (n > 1 ? 'secagens' : 'secagem');
+      return n + ' ' + nome;
+    }).join(' e ');
+  }
+
+  setQtd('Lavagem', 0);
+  setQtd('Secagem', 0);
 
   btnValidar.addEventListener('click', async function(){
     erroGeral.classList.remove('show');
@@ -589,75 +836,194 @@
       erroCpf.classList.add('show');
       return;
     }
-    // proteção extra: revalida regra de terça/quarta no momento do clique
-    if(ehDiaPromocional(agora()) && servicoSelecionado === 'Secagem'){
+    if(ehDiaPromocional(agora()) && qtd.Secagem > 0){
       erroGeral.textContent = 'Hoje é dia promocional — Secagem não pode ser carimbada às terças e quartas.';
       erroGeral.classList.add('show');
       return;
     }
 
+    var itens = [];
+    if(qtd.Lavagem > 0) itens.push({ servico:'Lavagem', quantidade: qtd.Lavagem });
+    if(qtd.Secagem > 0) itens.push({ servico:'Secagem', quantidade: qtd.Secagem });
+    if(!itens.length) return;
+
     btnValidar.disabled = true;
     btnValidar.innerHTML = '<span>⏳</span> Registrando…';
 
     try{
-      var novo = await inserirCheckin(inputCpf.value, servicoSelecionado);
-      var d = new Date(novo.data_iso);
-      var dataLabel = pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear();
-      var horaLabel = pad(d.getHours())+':'+pad(d.getMinutes());
-      var contagem = novo.contagem;
+      var r = await inserirCheckin(inputCpf.value, itens);
+      ultimoResumo = r;
+      var total = r.registrados;
 
-      resultadoTitulo.textContent = 'Selo carimbado!';
-      resultadoTexto.textContent = novo.servico + ' registrada com sucesso em ' + dataLabel + ' às ' + horaLabel + '.';
-      if(contagem >= META_SELOS){
-        resultadoContagem.textContent = '🎉 Você completou ' + META_SELOS + ' selos! Fale com a equipe para resgatar seu serviço gratuito.';
-      } else {
-        resultadoContagem.textContent = 'Selo ' + contagem + ' de ' + META_SELOS + ' para o próximo serviço gratuito.';
-      }
+      resultadoTitulo.textContent = total === 1 ? 'Selo carimbado!' : total + ' selos carimbados!';
+      resultadoTexto.textContent = descreverItens(r.itens) + (total === 1 ? ' registrada' : ' registradas') +
+        ' em ' + dataLabelDe(r.data_iso) + ' às ' + horaLabelDe(r.data_iso) + '.';
+      resultadoCartao.innerHTML = htmlCartaoSelos(r);
+      resultadoContagem.textContent = mensagemProgresso(r);
+      resultadoContagem.classList.toggle('liberado', r.saldo >= META_SELOS);
 
       cartaoForm.style.display = 'none';
+      btnAbrirMeusSelos.style.display = 'none';
       resultadoOk.classList.add('show');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }catch(e){
       console.error(e);
-      erroGeral.textContent = 'Não foi possível registrar agora. Verifique sua internet e tente novamente.';
+      erroGeral.textContent = (e && e.message && e.message.indexOf('Failed to fetch') === -1)
+        ? e.message
+        : 'Não foi possível registrar agora. Verifique sua internet e tente novamente.';
       erroGeral.classList.add('show');
     }finally{
-      btnValidar.disabled = false;
-      btnValidar.innerHTML = '<span>🔖</span> Validar selo';
+      atualizarBotao();
     }
   });
 
   document.getElementById('btnNovoCheckin').addEventListener('click', function(){
     inputCpf.value = '';
-    servicoSelecionado = null;
-    optLavagem.classList.remove('sel');
-    optSecagem.classList.remove('sel');
+    setQtd('Lavagem', 0);
+    setQtd('Secagem', 0);
     erroCpf.classList.remove('show');
     erroGeral.classList.remove('show');
-    atualizarBotao();
     resultadoOk.classList.remove('show');
     cartaoForm.style.display = 'block';
+    btnAbrirMeusSelos.style.display = '';
+    atualizarBotao();
+  });
+
+  document.getElementById('btnVerHistorico').addEventListener('click', function(){
+    abrirConsulta(ultimoResumo);
+  });
+
+  btnAbrirMeusSelos.addEventListener('click', function(){
+    abrirConsulta(null);
+  });
+
+  // ============================================================
+  // TELA "MEUS SELOS" (consulta do cliente)
+  // ============================================================
+  var consultaCpf = document.getElementById('consultaCpf');
+  var erroConsultaCpf = document.getElementById('erroConsultaCpf');
+  var erroConsulta = document.getElementById('erroConsulta');
+  var btnConsultar = document.getElementById('btnConsultar');
+  var consultaForm = document.getElementById('consultaForm');
+  var consultaResultado = document.getElementById('consultaResultado');
+
+  function atualizarBotaoConsulta(){
+    btnConsultar.disabled = consultaCpf.value.replace(/\D/g,'').length !== 11;
+  }
+
+  consultaCpf.addEventListener('input', function(){
+    this.value = formatarCpfInput(this.value);
+    erroConsultaCpf.classList.remove('show');
+    erroConsulta.classList.remove('show');
+    atualizarBotaoConsulta();
+  });
+  consultaCpf.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && !btnConsultar.disabled) btnConsultar.click();
+  });
+
+  function abrirConsulta(resumoPronto){
+    mostrarTela('consulta');
+    erroConsultaCpf.classList.remove('show');
+    erroConsulta.classList.remove('show');
+    if(resumoPronto){
+      consultaCpf.value = resumoPronto.cpf;
+      mostrarResumo(resumoPronto);
+    } else {
+      consultaResultado.style.display = 'none';
+      consultaForm.style.display = 'block';
+      if(cpfValido(inputCpf.value)) consultaCpf.value = inputCpf.value;
+    }
+    atualizarBotaoConsulta();
+    window.scrollTo({ top: 0 });
+  }
+
+  btnConsultar.addEventListener('click', async function(){
+    erroConsulta.classList.remove('show');
+    if(!cpfValido(consultaCpf.value)){
+      erroConsultaCpf.classList.add('show');
+      return;
+    }
+    btnConsultar.disabled = true;
+    btnConsultar.innerHTML = '<span>⏳</span> Buscando seu cartão…';
+    try{
+      var r = await consultarCpf(consultaCpf.value);
+      mostrarResumo(r);
+    }catch(e){
+      console.error(e);
+      erroConsulta.textContent = 'Não foi possível buscar agora. Verifique sua internet e tente novamente.';
+      erroConsulta.classList.add('show');
+    }finally{
+      btnConsultar.innerHTML = '<span>⭐</span> Ver meu cartão';
+      atualizarBotaoConsulta();
+    }
+  });
+
+  function mostrarResumo(r){
+    var html;
+    if(!r.total){
+      html =
+        '<div class="cartao"><div class="consulta-vazia">' +
+          '<strong>Nenhum selo ainda</strong>' +
+          'Não encontramos serviços para o CPF ' + esc(r.cpf) + '. Carimbe seu primeiro selo e comece seu cartão!' +
+        '</div></div>';
+    } else {
+      var vouchers = Math.floor(r.saldo / META_SELOS);
+      html =
+        '<div class="cartao cartao-resumo">' +
+          '<div class="resumo-topo"><span class="eyebrow">Cartão atual</span><span class="cpf-mono">' + esc(r.cpf) + '</span></div>' +
+          htmlCartaoSelos(r) +
+          '<div class="msg-progresso' + (vouchers > 0 ? ' liberado' : '') + '">' + esc(mensagemProgresso(r)) + '</div>' +
+          '<div class="stats-cliente">' +
+            '<div class="stat-mini"><div class="num">' + r.cartoesCompletos + '</div><div class="lbl">Cartões completos</div></div>' +
+            '<div class="stat-mini"><div class="num">' + r.resgatados + '</div><div class="lbl">Serviços grátis usados</div></div>' +
+            '<div class="stat-mini"><div class="num">' + vouchers + '</div><div class="lbl">Vouchers liberados</div></div>' +
+          '</div>' +
+        '</div>' +
+        '<h3 class="hist-h3">Seus serviços</h3>' +
+        htmlHistorico(r);
+    }
+    html += '<div style="text-align:center;"><button class="btn-novo" id="btnConsultarOutro">Consultar outro CPF</button></div>';
+
+    consultaResultado.innerHTML = html;
+    consultaForm.style.display = 'none';
+    consultaResultado.style.display = 'block';
+
+    document.getElementById('btnConsultarOutro').addEventListener('click', function(){
+      consultaCpf.value = '';
+      consultaResultado.style.display = 'none';
+      consultaForm.style.display = 'block';
+      atualizarBotaoConsulta();
+      consultaCpf.focus();
+    });
+  }
+
+  document.getElementById('btnVoltarCarimbo').addEventListener('click', function(){
+    mostrarTela('cliente');
   });
 
   // ============================================================
   // NAVEGAÇÃO ENTRE TELAS
   // ============================================================
   var telaCliente = document.getElementById('telaCliente');
+  var telaConsulta = document.getElementById('telaConsulta');
   var telaLogin = document.getElementById('telaLogin');
   var telaPainel = document.getElementById('telaPainel');
   var btnTopoAcao = document.getElementById('btnTopoAcao');
+  var telaAtual = 'cliente';
 
   function mostrarTela(nome){
+    telaAtual = nome;
     telaCliente.style.display = nome === 'cliente' ? 'block' : 'none';
+    telaConsulta.style.display = nome === 'consulta' ? 'block' : 'none';
     telaLogin.style.display = nome === 'login' ? 'block' : 'none';
     telaPainel.style.display = nome === 'painel' ? 'block' : 'none';
 
     if(nome === 'painel'){
       btnTopoAcao.textContent = 'Sair';
-    } else if(nome === 'login'){
+    } else if(nome === 'login' || nome === 'consulta'){
       btnTopoAcao.textContent = '← Voltar';
     } else {
-      btnTopoAcao.textContent = 'Acesso à área interna';
+      btnTopoAcao.textContent = '⭐ Meus selos';
     }
   }
 
@@ -666,13 +1032,13 @@
   });
 
   btnTopoAcao.addEventListener('click', function(){
-    if(estaLogado){
+    if(telaAtual === 'painel'){
       estaLogado = false;
       mostrarTela('cliente');
-    } else if(telaLogin.style.display === 'block'){
+    } else if(telaAtual === 'login' || telaAtual === 'consulta'){
       mostrarTela('cliente');
     } else {
-      mostrarTela('login');
+      abrirConsulta(null);
     }
   });
 
@@ -747,7 +1113,7 @@
   }
 
   var todosCheckins = [];
-  var todosResgates = {};
+  var todosResgates = [];
 
   async function carregarPainel(){
     try{
@@ -820,22 +1186,31 @@
   // PAINEL — PÓDIO
   // ============================================================
   function renderizarPodio(){
-    var resgates = todosResgates;
-
     var porCpf = {};
     todosCheckins.forEach(function(c){
-      var ultimoResgate = resgates[c.cpf] ? new Date(resgates[c.cpf]) : null;
-      if(ultimoResgate && new Date(c.data_iso) <= ultimoResgate) return;
-      if(!porCpf[c.cpf]) porCpf[c.cpf] = [];
-      porCpf[c.cpf].push(c);
+      (porCpf[c.cpf] = porCpf[c.cpf] || []).push(c);
+    });
+    var usadosPorCpf = {};
+    (todosResgates || []).forEach(function(r){
+      usadosPorCpf[r.cpf] = (usadosPorCpf[r.cpf] || 0) + 1;
     });
 
     var entradas = Object.keys(porCpf).map(function(cpf){
       var itens = porCpf[cpf].sort(function(a,b){ return new Date(a.data_iso) - new Date(b.data_iso); });
-      return { cpf: cpf, qtd: itens.length, ultima: itens[itens.length-1] };
-    });
+      var total = itens.length;
+      var usados = usadosPorCpf[cpf] || 0;
+      var saldo = Math.max(0, total - META_SELOS * usados);
+      return {
+        cpf: cpf, total: total, usados: usados, saldo: saldo,
+        vouchers: Math.floor(saldo / META_SELOS),
+        resto: saldo % META_SELOS,
+        ultima: itens[itens.length - 1]
+      };
+    }).filter(function(e){ return e.saldo > 0; });
 
-    entradas.sort(function(a,b){ return b.qtd - a.qtd; });
+    entradas.sort(function(a,b){
+      return (b.saldo - a.saldo) || (new Date(b.ultima.data_iso) - new Date(a.ultima.data_iso));
+    });
 
     var grade = document.getElementById('podioGrade');
     var vazio = document.getElementById('vazioPodio');
@@ -848,18 +1223,25 @@
     vazio.style.display = 'none';
 
     grade.innerHTML = entradas.map(function(e, i){
-      var pronto = e.qtd >= META_SELOS;
-      var pct = Math.min(100, Math.round((e.qtd / META_SELOS) * 100));
-      return '<div class="podio-item '+(pronto?'pronto':'')+'">'+
-        '<div class="podio-pos">'+(i+1)+'º</div>'+
-        '<div class="podio-info">'+
-          '<div class="cpf">'+e.cpf+'</div>'+
-          '<div class="progresso-txt">'+e.qtd+' de '+META_SELOS+' selos · última visita '+dataLabelDe(e.ultima.data_iso)+'</div>'+
-          '<div class="barra-bg"><div class="barra-fill" style="width:'+pct+'%;"></div></div>'+
-        '</div>'+
+      var pronto = e.vouchers > 0;
+      var pct = pronto ? 100 : Math.round((e.saldo / META_SELOS) * 100);
+      var linha = pronto
+        ? (e.vouchers > 1 ? e.vouchers + ' vouchers liberados' : 'Voucher liberado') +
+          (e.resto > 0 ? ' · +' + e.resto + ' no próximo cartão' : '')
+        : e.saldo + ' de ' + META_SELOS + ' selos · faltam ' + (META_SELOS - e.saldo);
+      linha += ' · última visita ' + dataLabelDe(e.ultima.data_iso);
+      if(e.usados > 0) linha += ' · ' + e.usados + (e.usados > 1 ? ' grátis já usados' : ' grátis já usado');
+
+      return '<div class="podio-item ' + (pronto ? 'pronto' : '') + '">' +
+        '<div class="podio-pos">' + (i + 1) + 'º</div>' +
+        '<div class="podio-info">' +
+          '<div class="cpf">' + esc(e.cpf) + '</div>' +
+          '<div class="progresso-txt">' + linha + '</div>' +
+          '<div class="barra-bg"><div class="barra-fill" style="width:' + pct + '%;"></div></div>' +
+        '</div>' +
         (pronto
-          ? '<button class="btn-resgatar" data-cpf="'+e.cpf+'">Marcar resgatado</button>'
-          : '<div class="selo-fundo">'+e.qtd+'/'+META_SELOS+'</div>'
+          ? '<button class="btn-resgatar" data-cpf="' + esc(e.cpf) + '">Dar baixa no voucher</button>'
+          : '<div class="selo-fundo">' + e.saldo + '/' + META_SELOS + '</div>'
         ) +
       '</div>';
     }).join('');
@@ -867,17 +1249,20 @@
     grade.querySelectorAll('.btn-resgatar').forEach(function(btn){
       btn.addEventListener('click', async function(){
         var cpf = btn.dataset.cpf;
+        if(!window.confirm('Dar baixa em 1 voucher do CPF ' + cpf + '?\n\n10 selos serão usados. O que passar disso continua no cartão dele.')) return;
         btn.disabled = true;
         btn.textContent = 'Salvando…';
         try{
-          await marcarResgate(cpf);
+          var r = await marcarResgate(cpf);
           await carregarPainel();
-          mostrarToast('Resgate registrado. Contagem reiniciada para ' + cpf + '.');
+          mostrarToast(r.saldo > 0
+            ? 'Baixa registrada. ' + r.saldo + (r.saldo === 1 ? ' selo continua' : ' selos continuam') + ' no cartão de ' + cpf + '.'
+            : 'Baixa registrada. Cartão de ' + cpf + ' reiniciado.');
         }catch(e){
           console.error(e);
-          mostrarToast('Não foi possível registrar o resgate. Tente novamente.', true);
+          mostrarToast(e && e.message ? e.message : 'Não foi possível registrar a baixa. Tente novamente.', true);
           btn.disabled = false;
-          btn.textContent = 'Marcar resgatado';
+          btn.textContent = 'Dar baixa no voucher';
         }
       });
     });
