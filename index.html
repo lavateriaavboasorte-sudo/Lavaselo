@@ -166,14 +166,16 @@
 
   /* Cartão de selos (10 bolinhas) */
   .selos-grade{
-    display:grid; grid-template-columns:repeat(5, 1fr); gap:10px;
-    margin:18px auto 0; max-width:340px;
+    --tam-selo: clamp(40px, 13vw, 54px);
+    display:grid; grid-template-columns:repeat(5, var(--tam-selo)); justify-content:center;
+    gap:10px; margin:18px auto 0; position:relative; z-index:1;
   }
   .selo{
-    aspect-ratio:1; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    font-size:19px; font-family:var(--mono); font-weight:700;
+    width:var(--tam-selo); height:var(--tam-selo); box-sizing:border-box;
+    border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:19px; font-family:var(--mono); font-weight:700; line-height:1;
   }
-  .selo.vazio{ border:2px dashed var(--azul-linha); color:rgba(184,212,255,.45); font-size:13px; }
+  .selo.livre{ border:2px dashed var(--azul-linha); color:rgba(184,212,255,.45); font-size:13px; }
   .selo.cheio{ animation:carimbar .35s cubic-bezier(.34,1.56,.64,1) backwards; }
   .selo.cheio.lav{ background:rgba(43,127,255,.28); border:2px solid var(--agua); }
   .selo.cheio.sec{ background:rgba(255,122,40,.24); border:2px solid #FF8A3D; }
@@ -369,7 +371,78 @@
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
   .toast.erro{ border-color:var(--carimbo); color:#ff9381; }
 
+  /* ===== Painel: busca, ações, lançamento e edição ===== */
+  .busca-cpf{
+    background:var(--azul-painel); border:1px solid var(--azul-linha); color:#fff;
+    padding:8px 14px; border-radius:100px; font-size:13px; font-family:var(--mono); width:190px;
+  }
+  .busca-cpf:focus{ outline:none; border-color:var(--agua); }
+  .busca-cpf::placeholder{ color:rgba(184,212,255,.5); }
+  .tabela-wrap{ overflow-x:auto; }
+  td.cpf-mono{ white-space:nowrap; }
+  .acoes-linha{ display:flex; gap:6px; justify-content:flex-end; }
+  .btn-acao{
+    width:34px; height:34px; border-radius:9px; border:1px solid var(--azul-linha);
+    background:transparent; cursor:pointer; font-size:15px; display:flex; align-items:center; justify-content:center;
+  }
+  .btn-acao:hover{ border-color:var(--agua); background:rgba(43,127,255,.12); }
+  .btn-acao.apagar:hover{ border-color:var(--carimbo); background:rgba(232,34,10,.12); }
+  .btn-acao:disabled{ opacity:.4; cursor:wait; }
+
+  .form-painel{
+    background:var(--azul-painel); border:1px solid var(--azul-linha); border-radius:16px;
+    padding:24px; max-width:520px;
+  }
+  .form-painel .linha2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .form-painel label, .modal label{
+    display:block; font-size:11.5px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--texto-fraco); margin:0 0 7px; font-family:var(--mono);
+  }
+  .form-painel .grupo, .modal .grupo{ margin-bottom:16px; }
+  .campo-painel{
+    width:100%; background:var(--azul-fundo); border:1.5px solid var(--azul-linha); color:#fff;
+    padding:12px 14px; border-radius:10px; font-size:16px; font-family:var(--corpo);
+    color-scheme:dark;
+  }
+  .campo-painel:focus{ outline:none; border-color:var(--agua); }
+  .campo-painel.mono{ font-family:var(--mono); }
+  .ajuda-painel{ font-size:12.5px; color:var(--texto-fraco); margin:-4px 0 16px; line-height:1.5; }
+  .btn-painel{
+    width:100%; background:var(--agua); color:#fff; border:none; padding:14px; border-radius:10px;
+    font-size:15px; font-weight:700; cursor:pointer; font-family:var(--corpo);
+  }
+  .btn-painel:hover{ filter:brightness(1.1); }
+  .btn-painel:disabled{ opacity:.5; cursor:wait; }
+  .btn-painel.secundario{ background:transparent; border:1px solid var(--azul-linha); }
+  .resultado-lancar{
+    margin-top:16px; padding:13px 15px; border-radius:10px; font-size:14px; line-height:1.5;
+    background:rgba(43,127,255,.14); border:1px solid var(--azul-linha); display:none;
+  }
+  .resultado-lancar.show{ display:block; }
+
+  .modal-fundo{
+    position:fixed; inset:0; background:rgba(4,10,40,.72); z-index:600;
+    display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-fundo.show{ display:flex; animation:surgir .2s ease; }
+  .modal{
+    background:var(--azul-painel); border:1px solid var(--azul-linha); border-radius:18px;
+    padding:26px 24px; width:100%; max-width:420px; max-height:90vh; overflow:auto;
+  }
+  .modal h3{ font-family:var(--display); font-size:21px; margin-bottom:18px; }
+  .modal .botoes{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px; }
+  .modal .erro-geral{ margin:0 0 14px; }
+
   @media (max-width:600px){
+    .busca-cpf{ width:100%; order:-1; }
+    .form-painel{ padding:18px; }
+    th.col-hora, td.col-hora{ display:none; }
+    .tabela-wrap th, .tabela-wrap td{ padding:11px 8px; font-size:13px; }
+    .tabela-wrap td.cpf-mono{ font-size:12.5px; }
+    .tabela-wrap .tag-serv{ padding:3px 8px; font-size:11px; }
+    .col-ano{ display:none; }
+    .btn-acao{ width:31px; height:31px; font-size:13.5px; }
+    .acoes-linha{ gap:5px; }
     .container{ padding:36px 18px 60px; }
     .servicos{ grid-template-columns:1fr 1fr; }
     .servico-opt{ min-height:104px; }
@@ -524,6 +597,7 @@
 
       <div class="abas">
         <button class="aba ativa" data-secao="secaoLista">Check-ins</button>
+        <button class="aba" data-secao="secaoLancar">Lançar selos</button>
         <button class="aba" data-secao="secaoPodio">Pódio (10 selos)</button>
       </div>
 
@@ -532,6 +606,7 @@
           <button class="filtro-btn ativo" data-periodo="semana">Esta semana</button>
           <button class="filtro-btn" data-periodo="mes">Este mês</button>
           <button class="filtro-btn" data-periodo="todos">Todos</button>
+          <input type="text" class="busca-cpf" id="buscaCpf" placeholder="Buscar CPF…" inputmode="numeric" maxlength="14">
           <button class="btn-atualizar" id="btnAtualizarLista">↻ Atualizar</button>
         </div>
 
@@ -540,11 +615,44 @@
         <div class="tabela-wrap">
           <table>
             <thead>
-              <tr><th>CPF</th><th>Serviço</th><th>Data</th><th>Hora</th></tr>
+              <tr><th>CPF</th><th>Serviço</th><th>Data</th><th class="col-hora">Hora</th><th style="text-align:right;">Ações</th></tr>
             </thead>
             <tbody id="corpoTabela"></tbody>
           </table>
           <div class="vazio" id="vazioLista" style="display:none;">Nenhum check-in neste período ainda.</div>
+        </div>
+      </div>
+
+      <div class="secao" id="secaoLancar">
+        <div class="form-painel">
+          <p class="ajuda-painel" style="margin:0 0 18px;">Use para registrar selos de clientes que esqueceram de carimbar, com a data e a hora certas do serviço.</p>
+          <div class="grupo">
+            <label for="lancarCpf">CPF do cliente</label>
+            <input type="text" class="campo-painel mono" id="lancarCpf" placeholder="000.000.000-00" inputmode="numeric" maxlength="14">
+          </div>
+          <div class="linha2">
+            <div class="grupo">
+              <label for="lancarLav">💧 Lavagens</label>
+              <input type="number" class="campo-painel" id="lancarLav" min="0" max="10" value="0" inputmode="numeric">
+            </div>
+            <div class="grupo">
+              <label for="lancarSec">🔥 Secagens</label>
+              <input type="number" class="campo-painel" id="lancarSec" min="0" max="10" value="0" inputmode="numeric">
+            </div>
+          </div>
+          <div class="linha2">
+            <div class="grupo">
+              <label for="lancarData">Data do serviço</label>
+              <input type="date" class="campo-painel" id="lancarData">
+            </div>
+            <div class="grupo">
+              <label for="lancarHora">Hora</label>
+              <input type="time" class="campo-painel" id="lancarHora">
+            </div>
+          </div>
+          <button class="btn-painel" id="btnLancar">Lançar selos</button>
+          <div class="erro-geral" id="erroLancar"></div>
+          <div class="resultado-lancar" id="resultadoLancar"></div>
         </div>
       </div>
 
@@ -561,6 +669,38 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="modal-fundo" id="modalEditar" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+  <div class="modal">
+    <h3 id="modalTitulo">Editar selo</h3>
+    <div class="erro-geral" id="erroEditar"></div>
+    <div class="grupo">
+      <label for="editCpf">CPF</label>
+      <input type="text" class="campo-painel mono" id="editCpf" inputmode="numeric" maxlength="14">
+    </div>
+    <div class="grupo">
+      <label for="editServico">Serviço</label>
+      <select class="campo-painel" id="editServico">
+        <option value="Lavagem">💧 Lavagem</option>
+        <option value="Secagem">🔥 Secagem</option>
+      </select>
+    </div>
+    <div class="linha2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div class="grupo">
+        <label for="editData">Data</label>
+        <input type="date" class="campo-painel" id="editData">
+      </div>
+      <div class="grupo">
+        <label for="editHora">Hora</label>
+        <input type="time" class="campo-painel" id="editHora">
+      </div>
+    </div>
+    <div class="botoes">
+      <button class="btn-painel secundario" id="btnCancelarEdicao">Cancelar</button>
+      <button class="btn-painel" id="btnSalvarEdicao">Salvar</button>
+    </div>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -588,8 +728,7 @@
   }
 
   var META_SELOS = 10;
-  var LOGIN_USUARIO = "Erike Brusnney";
-  var LOGIN_SENHA = "LavaSelo1";
+  var adminAuth = null;   // usuário e senha ficam só na memória enquanto o painel está aberto
 
   var estaLogado = false;
 
@@ -650,7 +789,7 @@
 
   // Traz tudo de uma vez: check-ins e resgates (painel interno)
   async function buscarTudo(){
-    var d = await chamar({ acao:'listar' });
+    var d = await chamar({ acao:'listar', auth: adminAuth });
     var resgates = d.resgates || [];
     if(!Array.isArray(resgates)){
       // compatibilidade com o formato antigo {cpf: data}
@@ -665,7 +804,19 @@
   }
 
   async function marcarResgate(cpf){
-    return await chamar({ acao:'resgate', cpf: cpf });
+    return await chamar({ acao:'resgate', cpf: cpf, auth: adminAuth });
+  }
+
+  async function lancarSelos(cpf, itens, dataIso){
+    return await chamar({ acao:'lancar', cpf: cpf, itens: itens, data_iso: dataIso, auth: adminAuth });
+  }
+
+  async function editarRegistro(chave, novo){
+    return await chamar({ acao:'editar', chave: chave, novo: novo, auth: adminAuth });
+  }
+
+  async function excluirRegistro(chave){
+    return await chamar({ acao:'excluir', chave: chave, auth: adminAuth });
   }
 
   // ============================================================
@@ -707,7 +858,7 @@
         var sec = s.servico === 'Secagem';
         html += '<div class="selo cheio ' + (sec ? 'sec' : 'lav') + '" style="animation-delay:' + (i * 45) + 'ms" title="' + esc(s.servico) + '">' + (sec ? '🔥' : '💧') + '</div>';
       } else {
-        html += '<div class="selo vazio">' + (i === META_SELOS - 1 ? '🎁' : (i + 1)) + '</div>';
+        html += '<div class="selo livre">' + (i === META_SELOS - 1 ? '🎁' : (i + 1)) + '</div>';
       }
     }
     return html + '</div>';
@@ -1034,6 +1185,7 @@
   btnTopoAcao.addEventListener('click', function(){
     if(telaAtual === 'painel'){
       estaLogado = false;
+      adminAuth = null;
       mostrarTela('cliente');
     } else if(telaAtual === 'login' || telaAtual === 'consulta'){
       mostrarTela('cliente');
@@ -1051,18 +1203,34 @@
   document.getElementById('loginPass').addEventListener('keydown', function(e){ if(e.key==='Enter') tentarLogin(); });
   document.getElementById('loginUser').addEventListener('keydown', function(e){ if(e.key==='Enter') tentarLogin(); });
 
+  var btnEntrar = document.getElementById('btnEntrar');
+
   async function tentarLogin(){
     var u = document.getElementById('loginUser').value.trim();
     var p = document.getElementById('loginPass').value;
-    if(u === LOGIN_USUARIO && p === LOGIN_SENHA){
-      loginErro.classList.remove('show');
+    if(!u || !p){ loginErro.textContent = 'Preencha usuário e senha.'; loginErro.classList.add('show'); return; }
+    if(btnEntrar.disabled) return;
+
+    loginErro.classList.remove('show');
+    btnEntrar.disabled = true;
+    btnEntrar.textContent = 'Entrando…';
+    try{
+      var auth = { usuario: u, senha: p };
+      await chamar({ acao:'login', auth: auth });
+      adminAuth = auth;
       estaLogado = true;
       document.getElementById('loginUser').value = '';
       document.getElementById('loginPass').value = '';
       mostrarTela('painel');
+      prepararLancamento();
       await carregarPainel();
-    } else {
+    }catch(e){
+      loginErro.textContent = (e && e.message && e.message.indexOf('Failed to fetch') === -1)
+        ? e.message : 'Sem conexão. Verifique a internet e tente de novo.';
       loginErro.classList.add('show');
+    }finally{
+      btnEntrar.disabled = false;
+      btnEntrar.textContent = 'Entrar';
     }
   }
 
@@ -1137,11 +1305,22 @@
     return pad(d.getHours())+':'+pad(d.getMinutes());
   }
 
+  var linhasVisiveis = [];
+  var buscaCpf = document.getElementById('buscaCpf');
+  buscaCpf.addEventListener('input', function(){
+    this.value = formatarCpfInput(this.value);
+    renderizarLista();
+  });
+
   function renderizarLista(){
     var agoraD = agora();
     var lista = todosCheckins.slice().sort(function(a,b){ return new Date(b.data_iso) - new Date(a.data_iso); });
 
-    if(periodoAtivo === 'semana'){
+    var busca = buscaCpf.value.replace(/\D/g,'');
+    if(busca){
+      // buscando um CPF, mostra o histórico inteiro dele (ignora semana/mês)
+      lista = lista.filter(function(c){ return c.cpf.replace(/\D/g,'').indexOf(busca) === 0; });
+    } else if(periodoAtivo === 'semana'){
       var iniSem = inicioDaSemana(agoraD);
       lista = lista.filter(function(c){ return new Date(c.data_iso) >= iniSem; });
     } else if(periodoAtivo === 'mes'){
@@ -1159,23 +1338,186 @@
       statCard(totalSecagem, 'Secagens', '#FFB077') +
       statCard(cpfsUnicos, 'Clientes únicos');
 
+    linhasVisiveis = lista;
     var corpo = document.getElementById('corpoTabela');
     var vazio = document.getElementById('vazioLista');
     if(lista.length === 0){
       corpo.innerHTML = '';
+      vazio.textContent = busca ? 'Nenhum registro para esse CPF.' : 'Nenhum check-in neste período ainda.';
       vazio.style.display = 'block';
     } else {
       vazio.style.display = 'none';
-      corpo.innerHTML = lista.map(function(c){
+      corpo.innerHTML = lista.map(function(c, i){
         return '<tr>'+
-          '<td class="cpf-mono">'+c.cpf+'</td>'+
-          '<td><span class="tag-serv '+(c.servico==='Lavagem'?'lavagem':'secagem')+'">'+c.servico+'</span></td>'+
-          '<td>'+dataLabelDe(c.data_iso)+'</td>'+
-          '<td>'+horaLabelDe(c.data_iso)+'</td>'+
+          '<td class="cpf-mono">'+esc(c.cpf)+'</td>'+
+          '<td><span class="tag-serv '+(c.servico==='Lavagem'?'lavagem':'secagem')+'">'+esc(c.servico)+'</span></td>'+
+          '<td style="white-space:nowrap;">'+dataLabelDe(c.data_iso).slice(0,5)+'<span class="col-ano">'+dataLabelDe(c.data_iso).slice(5)+'</span></td>'+
+          '<td class="col-hora">'+horaLabelDe(c.data_iso)+'</td>'+
+          '<td><div class="acoes-linha">'+
+            '<button class="btn-acao" data-acao="editar" data-i="'+i+'" title="Editar" aria-label="Editar registro">✏️</button>'+
+            '<button class="btn-acao apagar" data-acao="apagar" data-i="'+i+'" title="Apagar" aria-label="Apagar registro">🗑️</button>'+
+          '</div></td>'+
         '</tr>';
       }).join('');
     }
   }
+
+  document.getElementById('corpoTabela').addEventListener('click', async function(ev){
+    var btn = ev.target.closest('.btn-acao');
+    if(!btn) return;
+    var reg = linhasVisiveis[Number(btn.dataset.i)];
+    if(!reg) return;
+
+    if(btn.dataset.acao === 'editar'){ abrirEdicao(reg); return; }
+
+    var aviso = 'Apagar este selo?\n\n' + reg.cpf + ' · ' + reg.servico + '\n' +
+      dataLabelDe(reg.data_iso) + ' às ' + horaLabelDe(reg.data_iso) + '\n\nNão dá para desfazer.';
+    if(!window.confirm(aviso)) return;
+    btn.disabled = true;
+    try{
+      await excluirRegistro({ cpf: reg.cpf, servico: reg.servico, data_iso: reg.data_iso });
+      await carregarPainel();
+      mostrarToast('Selo apagado.');
+    }catch(e){
+      console.error(e);
+      mostrarToast(e && e.message ? e.message : 'Não foi possível apagar.', true);
+      btn.disabled = false;
+    }
+  });
+
+  // ---------- Datas para os campos de data/hora (horário do aparelho) ----------
+  function paraCampoData(d){ return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
+  function paraCampoHora(d){ return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function juntarDataHora(data, hora, segundosDe){
+    if(!data || !hora) return null;
+    var p = data.split('-'), q = hora.split(':');
+    var d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]), Number(q[0]), Number(q[1]));
+    if(isNaN(d.getTime())) return null;
+    var ref = segundosDe || new Date();
+    d.setSeconds(ref.getSeconds(), ref.getMilliseconds());
+    return d;
+  }
+
+  // ============================================================
+  // PAINEL — LANÇAR SELOS
+  // ============================================================
+  var lancarCpf = document.getElementById('lancarCpf');
+  var lancarLav = document.getElementById('lancarLav');
+  var lancarSec = document.getElementById('lancarSec');
+  var lancarData = document.getElementById('lancarData');
+  var lancarHora = document.getElementById('lancarHora');
+  var btnLancar = document.getElementById('btnLancar');
+  var erroLancar = document.getElementById('erroLancar');
+  var resultadoLancar = document.getElementById('resultadoLancar');
+
+  function prepararLancamento(){
+    var d = new Date();
+    lancarData.value = paraCampoData(d);
+    lancarData.max = paraCampoData(d);
+    lancarHora.value = paraCampoHora(d);
+  }
+  prepararLancamento();
+
+  lancarCpf.addEventListener('input', function(){ this.value = formatarCpfInput(this.value); });
+
+  btnLancar.addEventListener('click', async function(){
+    erroLancar.classList.remove('show');
+    resultadoLancar.classList.remove('show');
+
+    var falha = function(msg){ erroLancar.textContent = msg; erroLancar.classList.add('show'); };
+    if(!cpfValido(lancarCpf.value)) return falha('CPF inválido. Confira os números.');
+    var nLav = parseInt(lancarLav.value, 10) || 0;
+    var nSec = parseInt(lancarSec.value, 10) || 0;
+    if(nLav < 0 || nSec < 0 || nLav > 10 || nSec > 10) return falha('Use de 0 a 10 em cada serviço.');
+    if(nLav + nSec === 0) return falha('Coloque pelo menos 1 lavagem ou secagem.');
+    var quando = juntarDataHora(lancarData.value, lancarHora.value);
+    if(!quando) return falha('Preencha a data e a hora.');
+    if(quando.getTime() > Date.now() + 10 * 60 * 1000) return falha('A data não pode ser no futuro.');
+
+    var itens = [];
+    if(nLav) itens.push({ servico:'Lavagem', quantidade:nLav });
+    if(nSec) itens.push({ servico:'Secagem', quantidade:nSec });
+
+    btnLancar.disabled = true;
+    btnLancar.textContent = 'Lançando…';
+    try{
+      var r = await lancarSelos(lancarCpf.value, itens, quando.toISOString());
+      resultadoLancar.innerHTML = '✅ <strong>' + r.registrados + (r.registrados === 1 ? ' selo lançado' : ' selos lançados') +
+        '</strong> para ' + esc(r.cpf) + ' em ' + dataLabelDe(quando.toISOString()) + ' às ' + horaLabelDe(quando.toISOString()) + '.<br>' +
+        esc(mensagemProgresso(r));
+      resultadoLancar.classList.add('show');
+      lancarLav.value = 0;
+      lancarSec.value = 0;
+      carregarPainel();
+    }catch(e){
+      console.error(e);
+      falha(e && e.message ? e.message : 'Não foi possível lançar agora.');
+    }finally{
+      btnLancar.disabled = false;
+      btnLancar.textContent = 'Lançar selos';
+    }
+  });
+
+  // ============================================================
+  // PAINEL — JANELA DE EDIÇÃO
+  // ============================================================
+  var modalEditar = document.getElementById('modalEditar');
+  var editCpf = document.getElementById('editCpf');
+  var editServico = document.getElementById('editServico');
+  var editData = document.getElementById('editData');
+  var editHora = document.getElementById('editHora');
+  var erroEditar = document.getElementById('erroEditar');
+  var btnSalvarEdicao = document.getElementById('btnSalvarEdicao');
+  var registroEditando = null;
+
+  function abrirEdicao(reg){
+    registroEditando = reg;
+    var d = new Date(reg.data_iso);
+    editCpf.value = reg.cpf;
+    editServico.value = reg.servico;
+    editData.value = paraCampoData(d);
+    editData.max = paraCampoData(new Date());
+    editHora.value = paraCampoHora(d);
+    erroEditar.classList.remove('show');
+    modalEditar.classList.add('show');
+  }
+  function fecharEdicao(){
+    modalEditar.classList.remove('show');
+    registroEditando = null;
+  }
+
+  editCpf.addEventListener('input', function(){ this.value = formatarCpfInput(this.value); });
+  document.getElementById('btnCancelarEdicao').addEventListener('click', fecharEdicao);
+  modalEditar.addEventListener('click', function(ev){ if(ev.target === modalEditar) fecharEdicao(); });
+  document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape' && modalEditar.classList.contains('show')) fecharEdicao(); });
+
+  btnSalvarEdicao.addEventListener('click', async function(){
+    if(!registroEditando) return;
+    erroEditar.classList.remove('show');
+    var falha = function(msg){ erroEditar.textContent = msg; erroEditar.classList.add('show'); };
+    if(!cpfValido(editCpf.value)) return falha('CPF inválido. Confira os números.');
+    var quando = juntarDataHora(editData.value, editHora.value, new Date(registroEditando.data_iso));
+    if(!quando) return falha('Preencha a data e a hora.');
+    if(quando.getTime() > Date.now() + 10 * 60 * 1000) return falha('A data não pode ser no futuro.');
+
+    btnSalvarEdicao.disabled = true;
+    btnSalvarEdicao.textContent = 'Salvando…';
+    try{
+      await editarRegistro(
+        { cpf: registroEditando.cpf, servico: registroEditando.servico, data_iso: registroEditando.data_iso },
+        { cpf: editCpf.value, servico: editServico.value, data_iso: quando.toISOString() }
+      );
+      fecharEdicao();
+      await carregarPainel();
+      mostrarToast('Selo atualizado.');
+    }catch(e){
+      console.error(e);
+      falha(e && e.message ? e.message : 'Não foi possível salvar.');
+    }finally{
+      btnSalvarEdicao.disabled = false;
+      btnSalvarEdicao.textContent = 'Salvar';
+    }
+  });
 
   function statCard(num, lbl, cor){
     var estilo = cor ? ' style="color:'+cor+';"' : '';
